@@ -21,7 +21,7 @@
     "tailwind-merge": "^2.2.0",
     "@tanstack/react-query": "^5.17.15",
     "react-hook-form": "^7.48.2",
-    "@hookform/resolvers": "^3.3.2",
+    "@hookform/resolvers": "^5.1.1",
     "zod": "^3.22.4",
     "react-hot-toast": "^2.4.1",
     "openai": "^5.10.1",
