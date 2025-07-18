@@ -283,13 +283,52 @@ router.get('/:teamId/prds',
   })
 );
 
+// Get team settings
+router.get('/:teamId/settings',
+  requireAuth,
+  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+    const { teamId } = req.params;
+    
+    const settings = await teamService.getTeamSettings(teamId, req.user.id);
+    
+    res.json({
+      success: true,
+      data: settings,
+    });
+  })
+);
+
+// Transfer team ownership
+router.post('/:teamId/transfer-ownership',
+  requireAuth,
+  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+    const { teamId } = req.params;
+    const { newOwnerId, reason } = req.body;
+    
+    if (!newOwnerId) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'New owner ID is required' 
+      });
+    }
+    
+    await teamService.transferOwnership(teamId, req.user.id, newOwnerId, reason);
+    
+    res.json({
+      success: true,
+      message: 'Ownership transferred successfully',
+    });
+  })
+);
+
 // Delete team
 router.delete('/:teamId',
   requireAuth,
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.params;
+    const { reason } = req.body;
     
-    await teamService.deleteTeam(teamId, req.user.id);
+    await teamService.deleteTeam(teamId, req.user.id, reason);
     
     res.json({
       success: true,

@@ -285,18 +285,143 @@ export class TeamService {
     return team;
   }
 
-  async deleteTeam(teamId: string, userId: string): Promise<void> {
+  async getTeamSettings(teamId: string, userId: string): Promise<any> {
+    // Verify user is a team member
+    await this.verifyTeamMembership(teamId, userId);
+
+    const team = await db('teams')
+      .where('id', teamId)
+      .first();
+
+    if (!team) {
+      throw new NotFoundError('Team not found');
+    }
+
+    // Get owner information
+    const owner = await db('users')
+      .where('id', team.owner_id)
+      .select('name', 'email')
+      .first();
+
+    // Get member count
+    const memberCountResult = await db('team_members')
+      .where('team_id', teamId)
+      .count('* as count')
+      .first();
+
+    return {
+      team,
+      memberCount: parseInt(memberCountResult?.count as string) || 0,
+      ownerName: owner?.name || owner?.email || 'Unknown',
+      createdAt: team.created_at
+    };
+  }
+
+  async transferOwnership(teamId: string, currentOwnerId: string, newOwnerId: string, reason?: string): Promise<void> {
+    // Verify current user is the owner
+    await this.verifyTeamPermission(teamId, currentOwnerId, ['owner']);
+
+    // Verify new owner is a team member
+    const newOwnerMember = await db('team_members')
+      .where({ team_id: teamId, user_id: newOwnerId })
+      .first();
+
+    if (!newOwnerMember) {
+      throw new ValidationError('New owner must be a team member');
+    }
+
+    if (currentOwnerId === newOwnerId) {
+      throw new ValidationError('Cannot transfer ownership to yourself');
+    }
+
+    await db.transaction(async (trx) => {
+      // Update team owner
+      await trx('teams')
+        .where('id', teamId)
+        .update({ owner_id: newOwnerId });
+
+      // Update roles
+      await trx('team_members')
+        .where({ team_id: teamId, user_id: newOwnerId })
+        .update({ role: 'owner' });
+
+      await trx('team_members')
+        .where({ team_id: teamId, user_id: currentOwnerId })
+        .update({ role: 'admin' });
+
+      // Log the ownership transfer (if activity logging exists)
+      try {
+        await trx('member_activity_logs').insert({
+          team_id: teamId,
+          user_id: currentOwnerId,
+          action: 'ownership_transferred',
+          metadata: JSON.stringify({
+            new_owner_id: newOwnerId,
+            reason: reason || 'Ownership transfer'
+          }),
+          target_resource_type: 'team',
+          target_resource_id: teamId
+        });
+      } catch (err) {
+        // Log activity table might not exist yet, continue without error
+      }
+    });
+  }
+
+  async deleteTeam(teamId: string, userId: string, reason?: string): Promise<void> {
     // Verify user is the owner
     await this.verifyTeamPermission(teamId, userId, ['owner']);
 
+    // Get team info for logging
+    const team = await db('teams').where('id', teamId).first();
+    
+    if (!team) {
+      throw new NotFoundError('Team not found');
+    }
+
     await db.transaction(async (trx) => {
+      // Log the deletion before removing everything
+      try {
+        await trx('member_activity_logs').insert({
+          team_id: teamId,
+          user_id: userId,
+          action: 'team_deleted',
+          metadata: JSON.stringify({
+            team_name: team.name,
+            reason: reason || 'Team deletion'
+          }),
+          target_resource_type: 'team',
+          target_resource_id: teamId
+        });
+      } catch (err) {
+        // Log activity table might not exist yet, continue without error
+      }
+
       // Update users who have this as current team
       await trx('users')
         .where('current_team_id', teamId)
         .update({ current_team_id: null });
 
-      // Delete all related data
-      await trx('analytics_events').where('team_id', teamId).del();
+      // Delete all related data in correct order
+      try {
+        await trx('member_activity_logs').where('team_id', teamId).del();
+      } catch (err) {
+        // Table might not exist yet
+      }
+      
+      try {
+        await trx('role_change_history').where('team_id', teamId).del();
+      } catch (err) {
+        // Table might not exist yet
+      }
+      
+      try {
+        await trx('team_invitations').where('team_id', teamId).del();
+      } catch (err) {
+        // Table might not exist yet
+      }
+
+      // Delete main data
       await trx('prds').where('team_id', teamId).del();
       await trx('templates').where('team_id', teamId).del();
       await trx('team_members').where('team_id', teamId).del();
