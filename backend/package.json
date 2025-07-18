@@ -28,7 +28,7 @@
     "openai": "^5.10.1",
     "pg": "^8.11.3",
     "resend": "^2.0.0",
-    "uuid": "^9.0.1"
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
