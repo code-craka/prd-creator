@@ -1,0 +1,187 @@
+
+# Claude Code local settings
+.claude/settings.local.json
+.claude/transcript-*.jsonl
+
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Build outputs
+dist/
+build/
+*/dist/
+*/build/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*/.env
+*/.env.local
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Testing
+coverage/
+*/coverage/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+
+# Uploads and temporary files
+uploads/
+temp/
+tmp/
+*.tmp
+
+# Package lock files (optional - uncomment if using yarn)
+# package-lock.json
+# yarn.lock
+
+# TypeScript
+*.tsbuildinfo
+
+# Next.js (if added later)
+.next/
+out/
+
+# Nuxt.js (if added later)
+.nuxt/
+.output/
+
+# Gatsby (if added later)
+.cache/
+public/
+
+# Serverless
+.serverless/
+
+# AWS
+.aws/
+
+# Docker
+docker-compose.override.yml
+.docker/
+
+# Kubernetes
+*.kubeconfig
+
+# Backup files
+*.backup
+*.bak
+
+# Archive files
+*.tar
+*.zip
+*.gz
+*.rar
+
+# IDE specific
+*.swp
+*.swo
+*~
+
+# MacOS
+.AppleDouble
+.LSOverride
+
+# Windows
+desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# JetBrains
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# VS Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Vim
+*.swp
+*.swo
+Session.vim
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Security
+*.pem
+*.key
+*.crt
+*.csr
+*.p12
+*.pfx
+
+# Local development
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Testing
+jest.config.js.bak
+coverage/
+.nyc_output/
+
+# Misc
+.cache
+.parcel-cache
+.sass-cache
+.npm
+.yarn-integrity
+.yarn-error.log
+.pnpm-debug.log*
+.DS_Store
+*.log

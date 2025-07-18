@@ -1,0 +1,91 @@
+{
+    "permissions": {
+      "allow": [
+        "Bash(npm run *)",
+        "Bash(yarn *)",
+        "Bash(git *)",
+        "Bash(docker *)",
+        "Bash(psql *)",
+        "Bash(knex *)",
+        "Bash(curl http://localhost:*)",
+        "Bash(curl https://api.stripe.com/*)",
+        "Edit(backend/src/**/*)",
+        "Edit(frontend/src/**/*)",
+        "Edit(shared/**/*)",
+        "Edit(*.md)",
+        "Edit(*.json)",
+        "Edit(*.ts)",
+        "Edit(*.tsx)",
+        "Edit(*.js)",
+        "Edit(*.jsx)",
+        "Edit(*.sql)",
+        "Write(backend/src/**/*)",
+        "Write(frontend/src/**/*)",
+        "Write(shared/**/*)",
+        "Write(tests/**/*)",
+        "Write(docs/**/*)"
+      ],
+      "deny": [
+        "Bash(rm -rf *)",
+        "Bash(sudo *)",
+        "Edit(.env)",
+        "Edit(.env.*)",
+        "Write(.env)",
+        "Write(.env.*)",
+        "Edit(node_modules/**/*)",
+        "Write(node_modules/**/*)"
+      ],
+      "additionalDirectories": [
+        "../docs"
+      ],
+      "defaultMode": "acceptEdits"
+    },
+    "env": {
+      "NODE_ENV": "development",
+      "ANTHROPIC_API_KEY": "",
+      "DATABASE_URL": "postgresql://postgres:password@localhost:5432/prd_creator_dev"
+    },
+    "hooks": {
+      "PreToolUse": [
+        {
+          "matcher": "Write",
+          "hooks": [
+            {
+              "type": "command",
+              "command": ".claude/hooks/validate-write.sh"
+            }
+          ]
+        },
+        {
+          "matcher": "Edit",
+          "hooks": [
+            {
+              "type": "command",
+              "command": ".claude/hooks/validate-edit.sh"
+            }
+          ]
+        }
+      ],
+      "PostToolUse": [
+        {
+          "matcher": "Write.*\\.ts$|Edit.*\\.ts$",
+          "hooks": [
+            {
+              "type": "command",
+              "command": ".claude/hooks/format-typescript.sh"
+            }
+          ]
+        },
+        {
+          "matcher": "Bash\\(npm run db:migrate\\)",
+          "hooks": [
+            {
+              "type": "command",
+              "command": ".claude/hooks/post-migration.sh"
+            }
+          ]
+        }
+      ]
+    },
+    "includeCoAuthoredBy": true
+  }
