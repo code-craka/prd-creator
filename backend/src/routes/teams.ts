@@ -2,6 +2,7 @@ import express from 'express';
 import { requireAuth, AuthenticatedRequest } from '../middleware/auth';
 import { teamService } from '../services/teamService';
 import { prdService } from '../services/prdService';
+import { memberService } from '../services/memberService';
 import { validateBody, validateQuery } from '../utils/validation';
 import { createTeamSchema, inviteMemberSchema, updateMemberRoleSchema, prdFiltersSchema } from '../utils/validation';
 import { asyncWrapper } from '../utils/helpers';
@@ -90,30 +91,85 @@ router.put('/:teamId',
   })
 );
 
-// Invite team member
-router.post('/:teamId/invite',
+// Enhanced Invitation Management
+
+// Create invitation
+router.post('/:teamId/invitations',
   requireAuth,
-  validateBody(inviteMemberSchema),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.params;
-    const { email } = req.body;
+    const { email, role = 'member', message } = req.body;
     
-    await teamService.inviteMember(teamId, req.user.id, email);
+    const invitation = await memberService.createInvitation(
+      teamId, 
+      req.user.id, 
+      email, 
+      role, 
+      message
+    );
     
-    res.json({
+    res.status(201).json({
       success: true,
-      message: 'Member invited successfully',
+      data: { invitation },
+      message: 'Invitation sent successfully',
     });
   })
 );
 
-// Get team members
+// Get team invitations
+router.get('/:teamId/invitations',
+  requireAuth,
+  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+    const { teamId } = req.params;
+    
+    const invitations = await memberService.getTeamInvitations(teamId, req.user.id);
+    
+    res.json({
+      success: true,
+      data: { invitations },
+    });
+  })
+);
+
+// Resend invitation
+router.post('/:teamId/invitations/:invitationId/resend',
+  requireAuth,
+  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+    const { teamId, invitationId } = req.params;
+    
+    await memberService.resendInvitation(teamId, req.user.id, invitationId);
+    
+    res.json({
+      success: true,
+      message: 'Invitation resent successfully',
+    });
+  })
+);
+
+// Cancel invitation
+router.delete('/:teamId/invitations/:invitationId',
+  requireAuth,
+  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+    const { teamId, invitationId } = req.params;
+    
+    await memberService.cancelInvitation(teamId, req.user.id, invitationId);
+    
+    res.json({
+      success: true,
+      message: 'Invitation cancelled successfully',
+    });
+  })
+);
+
+// Enhanced Member Management
+
+// Get team members with activity data
 router.get('/:teamId/members',
   requireAuth,
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.params;
     
-    const members = await teamService.getTeamMembers(teamId, req.user.id);
+    const members = await memberService.getTeamMembersWithActivity(teamId, req.user.id);
     
     res.json({
       success: true,
@@ -125,12 +181,11 @@ router.get('/:teamId/members',
 // Update member role
 router.put('/:teamId/members/:memberId/role',
   requireAuth,
-  validateBody(updateMemberRoleSchema),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const { teamId, memberId } = req.params;
-    const { role } = req.body;
+    const { role, reason } = req.body;
     
-    await teamService.updateMemberRole(teamId, req.user.id, memberId, role);
+    await memberService.updateMemberRole(teamId, req.user.id, memberId, role, reason);
     
     res.json({
       success: true,
@@ -144,12 +199,69 @@ router.delete('/:teamId/members/:memberId',
   requireAuth,
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const { teamId, memberId } = req.params;
+    const { reason } = req.body;
     
-    await teamService.removeMember(teamId, req.user.id, memberId);
+    await memberService.removeMember(teamId, req.user.id, memberId, reason);
     
     res.json({
       success: true,
       message: 'Member removed successfully',
+    });
+  })
+);
+
+// Activity and Analytics
+
+// Get member activity logs
+router.get('/:teamId/activity',
+  requireAuth,
+  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+    const { teamId } = req.params;
+    const { limit = 50 } = req.query;
+    
+    const activities = await memberService.getMemberActivity(
+      teamId, 
+      req.user.id, 
+      parseInt(limit as string)
+    );
+    
+    res.json({
+      success: true,
+      data: { activities },
+    });
+  })
+);
+
+// Get role change history
+router.get('/:teamId/role-history',
+  requireAuth,
+  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+    const { teamId } = req.params;
+    
+    const history = await memberService.getRoleChangeHistory(teamId, req.user.id);
+    
+    res.json({
+      success: true,
+      data: { history },
+    });
+  })
+);
+
+// Legacy compatibility routes
+
+// Invite team member (legacy)
+router.post('/:teamId/invite',
+  requireAuth,
+  validateBody(inviteMemberSchema),
+  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+    const { teamId } = req.params;
+    const { email } = req.body;
+    
+    await teamService.inviteMember(teamId, req.user.id, email);
+    
+    res.json({
+      success: true,
+      message: 'Member invited successfully',
     });
   })
 );

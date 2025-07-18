@@ -41,7 +41,7 @@ export class PRDService {
       content: data.content,
       visibility: data.visibility || 'private',
       metadata: data.metadata || {},
-      template_id: data.templateId || null,
+      template_id: data.template_id || null,
     }).returning('*');
 
     // TODO: Track analytics

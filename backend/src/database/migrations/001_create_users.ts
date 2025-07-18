@@ -7,7 +7,7 @@ export async function up(knex: Knex): Promise<void> {
     table.string('name', 255).notNullable();
     table.string('password_hash', 255).notNullable();
     table.string('avatar_url', 500);
-    table.uuid('current_team_id').references('id').inTable('teams');
+    table.uuid('current_team_id'); // Remove foreign key constraint for now
     table.timestamps(true, true);
     
     // Indexes
