@@ -11,6 +11,7 @@ import authRoutes from './routes/auth';
 import teamRoutes from './routes/teams';
 import prdRoutes from './routes/prds';
 import userRoutes from './routes/users';
+import invitationRoutes from './routes/invitations';
 
 const app = express();
 
@@ -56,6 +57,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/teams', teamRoutes);
 app.use('/api/prds', prdRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/invitations', invitationRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

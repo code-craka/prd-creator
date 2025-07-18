@@ -10,8 +10,8 @@ const config: { [key: string]: Knex.Config } = {
       host: process.env.DB_HOST || 'localhost',
       port: parseInt(process.env.DB_PORT || '5432'),
       database: process.env.DB_NAME || 'prd_creator_dev',
-      user: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASSWORD || 'password'
+      user: process.env.DB_USER || 'prd_creator_dev',
+      password: process.env.DB_PASSWORD || 'prd_creator_dev'
     },
     migrations: {
       directory: './src/database/migrations',
@@ -33,8 +33,8 @@ const config: { [key: string]: Knex.Config } = {
       host: process.env.DB_HOST || 'localhost',
       port: parseInt(process.env.DB_PORT || '5432'),
       database: process.env.DB_NAME_TEST || 'prd_creator_test',
-      user: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASSWORD || 'password'
+      user: process.env.DB_USER || 'prd_creator_test',
+      password: process.env.DB_PASSWORD || 'prd_creator_test'
     },
     migrations: {
       directory: './src/database/migrations',

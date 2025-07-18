@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { env } from '../config/env';
 
 // Password utilities
@@ -15,13 +15,13 @@ export const comparePassword = async (password: string, hash: string): Promise<b
 
 // JWT utilities
 export const generateToken = (userId: string): string => {
-  return jwt.sign({ userId }, env.JWT_SECRET, {
+  return jwt.sign({ userId }, env.JWT_SECRET as string, {
     expiresIn: env.JWT_EXPIRES_IN,
-  });
+  } as SignOptions);
 };
 
 export const verifyToken = (token: string): any => {
-  return jwt.verify(token, env.JWT_SECRET);
+  return jwt.verify(token, env.JWT_SECRET as string);
 };
 
 // Slug generation
