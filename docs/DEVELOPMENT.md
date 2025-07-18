@@ -7,6 +7,7 @@ This guide provides detailed instructions for setting up and developing the PRD 
 ### Prerequisites
 
 Ensure you have the following installed:
+
 - **Node.js** 18.0+ ([Download](https://nodejs.org/))
 - **PostgreSQL** 14.0+ ([Download](https://www.postgresql.org/download/))
 - **Git** ([Download](https://git-scm.com/))

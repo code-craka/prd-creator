@@ -49,7 +49,8 @@ export const RegisterPage: React.FC = () => {
   });
 
   const onSubmit = (data: RegisterFormData) => {
-    const { confirmPassword, ...registerData } = data;
+    const { confirmPassword: _confirmPassword, ...registerData } = data;
+    // confirmPassword is only used for validation, not sent to API
     registerMutation.mutate(registerData);
   };
 

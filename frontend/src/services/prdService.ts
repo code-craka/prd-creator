@@ -1,5 +1,17 @@
 import { api, apiCall, ApiResponse } from './api';
-import { PRD, CreatePRDRequest, PRDFilters, PaginatedResponse } from 'prd-creator-shared';
+import { PRD, CreatePRDRequest, PRDFilters } from '../types/prd';
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+}
 
 export interface PRDWithAuthor extends PRD {
   author_name: string;
@@ -8,7 +20,8 @@ export interface PRDWithAuthor extends PRD {
 
 export const prdService = {
   async createPRD(data: CreatePRDRequest): Promise<PRD> {
-    return apiCall(() => api.post<ApiResponse<{ prd: PRD }>>('/prds', data));
+    const response = await apiCall(() => api.post<ApiResponse<{ prd: PRD }>>('/prds', data));
+    return response.prd;
   },
 
   async getUserPRDs(filters: PRDFilters = {}): Promise<PaginatedResponse<PRD>> {
@@ -40,11 +53,13 @@ export const prdService = {
   },
 
   async getPRD(id: string): Promise<PRD> {
-    return apiCall(() => api.get<ApiResponse<{ prd: PRD }>>(`/prds/${id}`));
+    const response = await apiCall(() => api.get<ApiResponse<{ prd: PRD }>>(`/prds/${id}`));
+    return response.prd;
   },
 
   async updatePRD(id: string, data: Partial<CreatePRDRequest>): Promise<PRD> {
-    return apiCall(() => api.put<ApiResponse<{ prd: PRD }>>(`/prds/${id}`, data));
+    const response = await apiCall(() => api.put<ApiResponse<{ prd: PRD }>>(`/prds/${id}`, data));
+    return response.prd;
   },
 
   async deletePRD(id: string): Promise<void> {

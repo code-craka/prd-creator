@@ -14,6 +14,7 @@ jobs:
       postgres:
         image: postgres:14
         env:
+          POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: prd_creator_test
         options: >-
@@ -37,9 +38,16 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+        cache-dependency-path: '**/package-lock.json'
 
-    - name: Install dependencies
+    - name: Install root dependencies
       run: npm ci
+
+    - name: Install workspace dependencies
+      run: |
+        cd shared && npm ci
+        cd ../backend && npm ci
+        cd ../frontend && npm ci
 
     - name: Build shared package
       run: |
@@ -49,9 +57,9 @@ jobs:
     - name: Run TypeScript compiler
       run: |
         cd backend
-        npm run type-check
+        npm run build
         cd ../frontend
-        npm run type-check
+        npm run build
 
     - name: Run linter
       run: npm run lint
@@ -61,17 +69,31 @@ jobs:
         cd backend
         cp .env.example .env
         sed -i 's/prd_creator_dev/prd_creator_test/g' .env
-        npm run db:migrate
+        sed -i 's/your_username/postgres/g' .env
+        sed -i 's/your_password/postgres/g' .env
+        NODE_ENV=test npm run db:migrate
       env:
-        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/prd_creator_test
+        DB_HOST: localhost
+        DB_PORT: 5432
+        DB_NAME: prd_creator_test
+        DB_NAME_TEST: prd_creator_test
+        DB_USER: postgres
+        DB_PASSWORD: postgres
+        JWT_SECRET: test-secret-for-ci
+        NODE_ENV: test
 
     - name: Run backend tests
       run: |
         cd backend
-        npm run test
+        NODE_ENV=test npm run test
       env:
-        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/prd_creator_test
-        JWT_SECRET: test-secret
+        DB_HOST: localhost
+        DB_PORT: 5432
+        DB_NAME: prd_creator_test
+        DB_NAME_TEST: prd_creator_test
+        DB_USER: postgres
+        DB_PASSWORD: postgres
+        JWT_SECRET: test-secret-for-ci
         NODE_ENV: test
 
     - name: Run frontend tests
@@ -102,6 +124,7 @@ jobs:
       with:
         node-version: '18.x'
         cache: 'npm'
+        cache-dependency-path: '**/package-lock.json'
 
     - name: Install dependencies
       run: npm ci
@@ -131,6 +154,7 @@ jobs:
       with:
         node-version: '18.x'
         cache: 'npm'
+        cache-dependency-path: '**/package-lock.json'
 
     - name: Install dependencies
       run: npm ci

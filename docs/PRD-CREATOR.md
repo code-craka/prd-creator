@@ -189,7 +189,7 @@ const PRDCreator = () => {
     setIsGenerating(true);
     setError('');
     setGeneratedPRD(''); // Clear previous PRD
-    
+
     const prompt = `Create a professional one-pager PRD based on these inputs:
 
     1. Product/Feature: ${formData.question1}
@@ -270,7 +270,7 @@ const PRDCreator = () => {
 
   return (
     <div className="h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 flex overflow-hidden relative">
-      {/* Glassmorphism background elements */}
+      {/*Glassmorphism background elements*/}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-10 left-10 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
         <div className="absolute top-0 right-20 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>

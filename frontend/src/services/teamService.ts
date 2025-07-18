@@ -1,5 +1,5 @@
 import { api, apiCall, ApiResponse } from './api';
-import { Team, TeamMember, CreateTeamRequest } from 'prd-creator-shared';
+import { Team, TeamMember, CreateTeamRequest, TeamSettings, TransferOwnershipRequest, DeleteTeamRequest } from '../types/team';
 
 export interface TeamWithRole extends Team {
   role: string;
@@ -21,7 +21,8 @@ export interface UpdateTeamRequest {
 
 export const teamService = {
   async createTeam(data: CreateTeamRequest): Promise<Team> {
-    return apiCall(() => api.post<ApiResponse<{ team: Team }>>('/teams', data));
+    const response = await apiCall(() => api.post<ApiResponse<{ team: Team }>>('/teams', data));
+    return response.team;
   },
 
   async getUserTeams(): Promise<TeamWithRole[]> {
@@ -30,15 +31,18 @@ export const teamService = {
   },
 
   async switchTeam(teamId: string): Promise<Team> {
-    return apiCall(() => api.post<ApiResponse<{ team: Team }>>('/teams/switch', { teamId }));
+    const response = await apiCall(() => api.post<ApiResponse<{ team: Team }>>('/teams/switch', { teamId }));
+    return response.team;
   },
 
   async getTeam(teamId: string): Promise<Team> {
-    return apiCall(() => api.get<ApiResponse<{ team: Team }>>(`/teams/${teamId}`));
+    const response = await apiCall(() => api.get<ApiResponse<{ team: Team }>>(`/teams/${teamId}`));
+    return response.team;
   },
 
   async updateTeam(teamId: string, data: UpdateTeamRequest): Promise<Team> {
-    return apiCall(() => api.put<ApiResponse<{ team: Team }>>(`/teams/${teamId}`, data));
+    const response = await apiCall(() => api.put<ApiResponse<{ team: Team }>>(`/teams/${teamId}`, data));
+    return response.team;
   },
 
   async deleteTeam(teamId: string): Promise<void> {
@@ -60,5 +64,18 @@ export const teamService = {
 
   async removeMember(teamId: string, memberId: string): Promise<void> {
     return apiCall(() => api.delete<ApiResponse>(`/teams/${teamId}/members/${memberId}`));
+  },
+
+  async getTeamSettings(teamId: string): Promise<TeamSettings> {
+    const response = await apiCall(() => api.get<ApiResponse<TeamSettings>>(`/teams/${teamId}/settings`));
+    return response;
+  },
+
+  async transferOwnership(teamId: string, data: TransferOwnershipRequest): Promise<void> {
+    return apiCall(() => api.post<ApiResponse>(`/teams/${teamId}/transfer-ownership`, data));
+  },
+
+  async deleteTeamWithReason(teamId: string, data: DeleteTeamRequest): Promise<void> {
+    return apiCall(() => api.delete<ApiResponse>(`/teams/${teamId}`, { data }));
   },
 };

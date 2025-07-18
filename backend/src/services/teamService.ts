@@ -457,6 +457,7 @@ export class TeamService {
     let slug = baseSlug;
     let counter = 1;
 
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       const existingTeam = await db('teams')
         .where('slug', slug)

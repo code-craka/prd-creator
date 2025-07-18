@@ -34,11 +34,22 @@ With team collaboration features, beautiful glassmorphism design, and AI integra
 - **Smart Template System**: Industry-specific templates for different product types
 - **Iterative Refinement**: Continuously improve PRDs with AI suggestions
 
-### 👥 Team Collaboration
+### 👥 Advanced Team Collaboration
 - **Multi-Team Workspaces**: Organize PRDs by teams and projects
-- **Role-Based Access Control**: Owner, Admin, and Member permissions
+- **Comprehensive Member Management**: Complete invitation system with pending/expired states
+- **Role-Based Permissions**: Granular access control with Owner, Admin, and Member roles
+- **Activity Tracking**: Full audit trail of team activities with member analytics
 - **Real-time Collaboration**: Share and edit PRDs with team members
-- **Member Invitation System**: Invite team members via email
+- **Advanced Invitations**: Send invitations with custom roles and personal messages
+- **Member Analytics**: Track individual contributions, PRD activity, and engagement
+
+### 🛡️ Team Administration
+- **Team Settings Page**: Complete team customization and configuration interface
+- **Ownership Transfer**: Secure ownership transfer with multi-step confirmation
+- **Team Deletion**: Protected team deletion with comprehensive data cleanup
+- **Member Role Management**: Dynamic role changes with full audit trail
+- **Activity Monitoring**: Real-time tracking of all team member activities
+- **Permission Controls**: Fine-grained access control for all team operations
 
 ### 🎨 Beautiful User Experience
 - **Glassmorphism Design**: Modern, elegant interface with glass-like effects

@@ -1,5 +1,5 @@
 import { db } from '../config/database';
-import { generateSlug, isValidEmail } from '../utils/helpers';
+import { isValidEmail } from '../utils/helpers';
 import { 
   ValidationError, 
   NotFoundError, 

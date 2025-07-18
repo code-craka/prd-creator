@@ -5,12 +5,14 @@ This document describes the database schema for the PRD Creator application.
 ## 🏗 Database Overview
 
 ### Technology Stack
+
 - **Database**: PostgreSQL 14.0+
 - **Query Builder**: Knex.js
 - **Migrations**: Knex migration system
 - **Connection Pooling**: Built-in PostgreSQL connection pooling
 
 ### Design Principles
+
 - **Normalized Design**: Reduces data redundancy
 - **UUID Primary Keys**: Better for distributed systems
 - **Timestamps**: All tables have `created_at` and `updated_at`
@@ -87,6 +89,7 @@ CREATE TRIGGER update_users_updated_at
 ```
 
 **Fields:**
+
 - `id`: UUID primary key
 - `email`: Unique email address for authentication
 - `name`: User's display name
@@ -125,6 +128,7 @@ CREATE TRIGGER update_teams_updated_at
 ```
 
 **Fields:**
+
 - `id`: UUID primary key
 - `name`: Team display name
 - `slug`: URL-friendly team identifier
@@ -158,6 +162,7 @@ CREATE INDEX idx_team_members_role ON team_members(role);
 ```
 
 **Fields:**
+
 - `id`: UUID primary key
 - `team_id`: Foreign key to teams table
 - `user_id`: Foreign key to users table
@@ -167,6 +172,7 @@ CREATE INDEX idx_team_members_role ON team_members(role);
 - `created_at`: Invitation creation timestamp
 
 **Role Hierarchy:**
+
 - `owner`: Full team control, can delete team
 - `admin`: Can manage members and settings
 - `member`: Can view and edit team PRDs
@@ -207,6 +213,7 @@ CREATE TRIGGER update_prds_updated_at
 ```
 
 **Fields:**
+
 - `id`: UUID primary key
 - `user_id`: Foreign key to users table (author)
 - `team_id`: Optional foreign key to teams table
@@ -221,6 +228,7 @@ CREATE TRIGGER update_prds_updated_at
 - `updated_at`: Last PRD update timestamp
 
 **Visibility Levels:**
+
 - `private`: Only visible to the author
 - `team`: Visible to team members
 - `public`: Visible to everyone with share link
@@ -258,6 +266,7 @@ CREATE TRIGGER update_templates_updated_at
 ```
 
 **Fields:**
+
 - `id`: UUID primary key
 - `team_id`: Optional team ownership
 - `name`: Template name
@@ -294,6 +303,7 @@ CREATE INDEX idx_analytics_created_at ON analytics_events(created_at);
 ```
 
 **Fields:**
+
 - `id`: UUID primary key
 - `user_id`: Optional user who performed the action
 - `team_id`: Optional team context
@@ -306,6 +316,7 @@ CREATE INDEX idx_analytics_created_at ON analytics_events(created_at);
 ## 🔗 Foreign Key Constraints
 
 ### Users Table
+
 ```sql
 -- Users can have a current team
 ALTER TABLE users ADD CONSTRAINT fk_users_current_team_id 
@@ -313,6 +324,7 @@ ALTER TABLE users ADD CONSTRAINT fk_users_current_team_id
 ```
 
 ### Teams Table
+
 ```sql
 -- Teams must have an owner
 ALTER TABLE teams ADD CONSTRAINT fk_teams_owner_id 
@@ -320,6 +332,7 @@ ALTER TABLE teams ADD CONSTRAINT fk_teams_owner_id
 ```
 
 ### Team Members Table
+
 ```sql
 -- Team members must reference valid team and user
 ALTER TABLE team_members ADD CONSTRAINT fk_team_members_team_id 
@@ -333,6 +346,7 @@ ALTER TABLE team_members ADD CONSTRAINT fk_team_members_invited_by
 ```
 
 ### PRDs Table
+
 ```sql
 -- PRDs must have an author
 ALTER TABLE prds ADD CONSTRAINT fk_prds_user_id 
@@ -348,6 +362,7 @@ ALTER TABLE prds ADD CONSTRAINT fk_prds_template_id
 ```
 
 ### Templates Table
+
 ```sql
 -- Templates must have a creator
 ALTER TABLE templates ADD CONSTRAINT fk_templates_created_by 
@@ -359,6 +374,7 @@ ALTER TABLE templates ADD CONSTRAINT fk_templates_team_id
 ```
 
 ### Analytics Events Table
+
 ```sql
 -- Analytics events can reference users and teams
 ALTER TABLE analytics_events ADD CONSTRAINT fk_analytics_user_id 
@@ -371,10 +387,12 @@ ALTER TABLE analytics_events ADD CONSTRAINT fk_analytics_team_id
 ## 🔍 Indexes and Performance
 
 ### Primary Indexes
+
 - All tables have UUID primary keys with automatic indexes
 - Unique constraints on email, slug, and share_token create indexes
 
 ### Query Optimization Indexes
+
 - `idx_users_email`: Fast user lookup during authentication
 - `idx_prds_user_id`: Fast PRD retrieval by author
 - `idx_prds_team_id`: Fast team PRD queries
@@ -382,11 +400,13 @@ ALTER TABLE analytics_events ADD CONSTRAINT fk_analytics_team_id
 - `idx_prds_created_at`: Time-based PRD queries
 
 ### Full-Text Search Indexes
+
 - `idx_prds_title`: Search PRDs by title
 - `idx_prds_content`: Search PRDs by content
 - Uses PostgreSQL's built-in GIN indexes for text search
 
 ### Composite Indexes (Future)
+
 ```sql
 -- For complex queries combining multiple conditions
 CREATE INDEX idx_prds_team_visibility ON prds(team_id, visibility);
@@ -396,6 +416,7 @@ CREATE INDEX idx_prds_user_created ON prds(user_id, created_at);
 ## 🔄 Data Migration Strategy
 
 ### Migration Files
+
 Located in `backend/src/database/migrations/`
 
 1. `001_create_users.ts` - User accounts and authentication
@@ -406,6 +427,7 @@ Located in `backend/src/database/migrations/`
 6. `006_add_foreign_key_constraints.ts` - Referential integrity
 
 ### Migration Commands
+
 ```bash
 # Run all pending migrations
 npm run db:migrate
@@ -423,11 +445,13 @@ npm run db:migrate:status
 ## 🌱 Seed Data
 
 ### Development Seeds
+
 Located in `backend/src/database/seeds/`
 
 - `001_sample_data.ts` - Sample users, teams, and PRDs for development
 
 ### Seed Commands
+
 ```bash
 # Run all seeds
 npm run db:seed
@@ -442,16 +466,19 @@ npm run db:seed:make seed_name
 ## 🔒 Security Considerations
 
 ### Password Security
+
 - Passwords are hashed using bcrypt with 12 rounds
 - No plaintext passwords stored in database
 - Password reset tokens have expiration times
 
 ### Data Privacy
+
 - Personal data is encrypted at rest
 - Sensitive fields are excluded from API responses
 - User data can be fully deleted (GDPR compliance)
 
 ### Access Control
+
 - Role-based access through team membership
 - Row-level security through user/team ownership
 - API endpoints validate permissions before data access
@@ -459,11 +486,13 @@ npm run db:seed:make seed_name
 ## 📊 Analytics and Reporting
 
 ### Event Tracking
+
 - User actions tracked in analytics_events table
 - Team-level analytics for workspace insights
 - PRD engagement metrics (views, shares, etc.)
 
 ### Common Queries
+
 ```sql
 -- Most active users
 SELECT u.name, COUNT(ae.id) as event_count
@@ -491,6 +520,7 @@ ORDER BY prd_count DESC;
 ## 🛠 Maintenance Tasks
 
 ### Regular Maintenance
+
 ```sql
 -- Clean up old analytics events (older than 1 year)
 DELETE FROM analytics_events 
@@ -505,6 +535,7 @@ VACUUM ANALYZE;
 ```
 
 ### Backup Strategy
+
 - Daily automated backups
 - Point-in-time recovery enabled
 - Backup retention: 30 days
@@ -513,6 +544,7 @@ VACUUM ANALYZE;
 ## 🔧 Development Tools
 
 ### Database Connection
+
 ```typescript
 // Knex configuration
 const config = {
@@ -538,6 +570,7 @@ const config = {
 ```
 
 ### Query Examples
+
 ```typescript
 // User with teams
 const userWithTeams = await db('users')

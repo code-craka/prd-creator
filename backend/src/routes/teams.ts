@@ -4,7 +4,7 @@ import { teamService } from '../services/teamService';
 import { prdService } from '../services/prdService';
 import { memberService } from '../services/memberService';
 import { validateBody, validateQuery } from '../utils/validation';
-import { createTeamSchema, inviteMemberSchema, updateMemberRoleSchema, prdFiltersSchema } from '../utils/validation';
+import { createTeamSchema, inviteMemberSchema, prdFiltersSchema } from '../utils/validation';
 import { asyncWrapper } from '../utils/helpers';
 
 const router = express.Router();

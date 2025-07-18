@@ -13,7 +13,7 @@ export async function seed(knex: Knex): Promise<void> {
   // Insert sample users
   const hashedPassword = await bcrypt.hash('password123', 10);
   
-  const users = await knex('users').insert([
+  await knex('users').insert([
     {
       id: '550e8400-e29b-41d4-a716-446655440000',
       email: 'john@example.com',
@@ -35,7 +35,7 @@ export async function seed(knex: Knex): Promise<void> {
   ]).returning('*');
 
   // Insert sample teams
-  const teams = await knex('teams').insert([
+  await knex('teams').insert([
     {
       id: '660e8400-e29b-41d4-a716-446655440000',
       name: 'Product Team',
