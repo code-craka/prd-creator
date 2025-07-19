@@ -22,7 +22,18 @@ export const inviteMemberSchema = Joi.object({
 });
 
 export const updateMemberRoleSchema = Joi.object({
-  role: Joi.string().valid('owner', 'admin', 'member').required(),
+  role: Joi.string().valid('admin', 'member').required(),
+  reason: Joi.string().max(500).optional(),
+});
+
+export const removeMemberSchema = Joi.object({
+  reason: Joi.string().max(500).optional(),
+});
+
+export const createInvitationSchema = Joi.object({
+  email: Joi.string().email().required(),
+  role: Joi.string().valid('admin', 'member').default('member'),
+  message: Joi.string().max(500).optional(),
 });
 
 // PRD validation schemas

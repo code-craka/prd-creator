@@ -4,7 +4,7 @@ import { teamService } from '../services/teamService';
 import { prdService } from '../services/prdService';
 import { memberService } from '../services/memberService';
 import { validateBody, validateQuery } from '../utils/validation';
-import { createTeamSchema, inviteMemberSchema, prdFiltersSchema } from '../utils/validation';
+import { createTeamSchema, inviteMemberSchema, updateMemberRoleSchema, removeMemberSchema, createInvitationSchema, prdFiltersSchema } from '../utils/validation';
 import { asyncWrapper } from '../utils/helpers';
 
 const router = express.Router();
@@ -96,6 +96,7 @@ router.put('/:teamId',
 // Create invitation
 router.post('/:teamId/invitations',
   requireAuth,
+  validateBody(createInvitationSchema),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.params;
     const { email, role = 'member', message } = req.body;
@@ -181,6 +182,7 @@ router.get('/:teamId/members',
 // Update member role
 router.put('/:teamId/members/:memberId/role',
   requireAuth,
+  validateBody(updateMemberRoleSchema),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const { teamId, memberId } = req.params;
     const { role, reason } = req.body;
@@ -197,6 +199,7 @@ router.put('/:teamId/members/:memberId/role',
 // Remove team member
 router.delete('/:teamId/members/:memberId',
   requireAuth,
+  validateBody(removeMemberSchema),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const { teamId, memberId } = req.params;
     const { reason } = req.body;
