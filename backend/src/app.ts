@@ -1,10 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import { createServer } from 'http';
 import { env } from './config/env';
 import { testConnection } from './config/database';
 import { errorHandler } from './middleware/errorHandler';
 import { requestLogger } from './middleware/requestLogger';
+import { CollaborationService } from './services/collaborationService';
 
 // Import routes
 import authRoutes from './routes/auth';
@@ -12,6 +14,8 @@ import teamRoutes from './routes/teams';
 import prdRoutes from './routes/prds';
 import userRoutes from './routes/users';
 import invitationRoutes from './routes/invitations';
+import aiRoutes from './routes/ai';
+import analyticsRoutes from './routes/analytics';
 
 const app = express();
 
@@ -44,7 +48,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(requestLogger);
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
@@ -58,6 +62,8 @@ app.use('/api/teams', teamRoutes);
 app.use('/api/prds', prdRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/invitations', invitationRoutes);
+app.use('/api/ai', aiRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
@@ -77,11 +83,18 @@ const startServer = async () => {
     // Test database connection
     await testConnection();
     
-    const server = app.listen(env.PORT, () => {
+    // Create HTTP server
+    const server = createServer(app);
+    
+    // Initialize collaboration service
+    new CollaborationService(server);
+    
+    server.listen(env.PORT, () => {
       console.log(`🚀 Server running on port ${env.PORT}`);
       console.log(`📱 Environment: ${env.NODE_ENV}`);
       console.log(`🔗 API URL: ${env.API_BASE_URL}`);
       console.log(`🌐 Frontend URL: ${env.FRONTEND_URL}`);
+      console.log(`🔄 Real-time collaboration enabled`);
     });
 
     // Graceful shutdown
