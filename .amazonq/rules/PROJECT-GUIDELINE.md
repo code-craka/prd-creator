@@ -45,7 +45,7 @@ PRD Creator is a productivity tool that transforms vague product ideas into clea
 
 ## Project Structure
 
-```
+```typescript
 prd-creator/
 ├── backend/
 │   ├── src/
@@ -407,4 +407,4 @@ First do read the following files and understand the codebase and code snippets
 /Users/rihan/all-coding-project/prd-creator/docs/TOTAL-PROJECT-CODESNIPPET.md
 /Users/rihan/all-coding-project/prd-creator/docs/TOTAL-PROJECT-CODESNIPPET-WEEKS 1-2.md
 /Users/rihan/all-coding-project/prd-creator/docs/PRD-CREATOR.md
-then do implement the code snippets in the files as per the instructions given in the files.
+then do implement the code snippets in the files as per the instructions given in the files

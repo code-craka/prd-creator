@@ -22,7 +22,7 @@ This document describes the database schema for the PRD Creator application.
 
 ## 📊 Entity Relationship Diagram
 
-```
+``` markdown
 ┌─────────────┐       ┌─────────────┐       ┌─────────────┐
 │    Users    │       │    Teams    │       │    PRDs     │
 ├─────────────┤       ├─────────────┤       ├─────────────┤
@@ -313,9 +313,9 @@ CREATE INDEX idx_analytics_created_at ON analytics_events(created_at);
 - `user_agent`: Browser/client information
 - `created_at`: Event timestamp
 
-## 🔗 Foreign Key Constraints
+## 🔗 Foreign-Key-Constraints
 
-### Users Table
+### Users-Table
 
 ```sql
 -- Users can have a current team
@@ -323,7 +323,7 @@ ALTER TABLE users ADD CONSTRAINT fk_users_current_team_id
     FOREIGN KEY (current_team_id) REFERENCES teams(id) ON DELETE SET NULL;
 ```
 
-### Teams Table
+### Teams-Table
 
 ```sql
 -- Teams must have an owner
@@ -331,7 +331,7 @@ ALTER TABLE teams ADD CONSTRAINT fk_teams_owner_id
     FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE;
 ```
 
-### Team Members Table
+### Team-Members Table
 
 ```sql
 -- Team members must reference valid team and user
@@ -345,7 +345,7 @@ ALTER TABLE team_members ADD CONSTRAINT fk_team_members_invited_by
     FOREIGN KEY (invited_by) REFERENCES users(id) ON DELETE SET NULL;
 ```
 
-### PRDs Table
+### PRDs-Table
 
 ```sql
 -- PRDs must have an author
@@ -361,7 +361,7 @@ ALTER TABLE prds ADD CONSTRAINT fk_prds_template_id
     FOREIGN KEY (template_id) REFERENCES templates(id) ON DELETE SET NULL;
 ```
 
-### Templates Table
+### Templates-Table
 
 ```sql
 -- Templates must have a creator
@@ -373,7 +373,7 @@ ALTER TABLE templates ADD CONSTRAINT fk_templates_team_id
     FOREIGN KEY (team_id) REFERENCES teams(id) ON DELETE SET NULL;
 ```
 
-### Analytics Events Table
+### Analytics-Events-Table
 
 ```sql
 -- Analytics events can reference users and teams

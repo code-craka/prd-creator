@@ -33,7 +33,7 @@ I have successfully implemented a comprehensive member management system for the
 
 **New API Endpoints:**
 
-```
+```typescript
 # Invitation Management
 POST   /api/teams/:teamId/invitations          # Create invitation
 GET    /api/teams/:teamId/invitations          # List invitations
@@ -225,6 +225,7 @@ cd backend && npm run db:migrate
 - `DeleteTeamModal.tsx` - Multi-step team deletion with confirmation
 
 **New API Endpoints:**
+
 ```typescript
 GET    /api/teams/:teamId/settings           # Get team settings
 POST   /api/teams/:teamId/transfer-ownership # Transfer ownership
