@@ -4,7 +4,7 @@ import { teamService } from '../services/teamService';
 import { prdService } from '../services/prdService';
 import { memberService } from '../services/memberService';
 import { validateBody, validateQuery } from '../utils/validation';
-import { createTeamSchema, inviteMemberSchema, updateMemberRoleSchema, removeMemberSchema, createInvitationSchema, prdFiltersSchema } from '../utils/validation';
+import { createTeamSchema, updateTeamSchema, transferOwnershipSchema, deleteTeamSchema, inviteMemberSchema, updateMemberRoleSchema, removeMemberSchema, createInvitationSchema, prdFiltersSchema } from '../utils/validation';
 import { asyncWrapper } from '../utils/helpers';
 
 const router = express.Router();
@@ -73,6 +73,7 @@ router.get('/:teamId',
 // Update team
 router.put('/:teamId',
   requireAuth,
+  validateBody(updateTeamSchema),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.params;
     const { name, description, avatar_url } = req.body;
@@ -304,16 +305,11 @@ router.get('/:teamId/settings',
 // Transfer team ownership
 router.post('/:teamId/transfer-ownership',
   requireAuth,
+  validateBody(transferOwnershipSchema),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.params;
     const { newOwnerId, reason } = req.body;
     
-    if (!newOwnerId) {
-      return res.status(400).json({ 
-        success: false,
-        error: 'New owner ID is required' 
-      });
-    }
     
     await teamService.transferOwnership(teamId, req.user.id, newOwnerId, reason);
     
@@ -327,11 +323,12 @@ router.post('/:teamId/transfer-ownership',
 // Delete team
 router.delete('/:teamId',
   requireAuth,
+  validateBody(deleteTeamSchema),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.params;
-    const { reason } = req.body;
+    const { confirmName, reason } = req.body;
     
-    await teamService.deleteTeam(teamId, req.user.id, reason);
+    await teamService.deleteTeam(teamId, req.user.id, confirmName, reason);
     
     res.json({
       success: true,

@@ -11,7 +11,7 @@ import {
 import { teamService } from '../../services/teamService';
 import { Team, DeleteTeamRequest } from '../../types/team';
 import { toast } from 'react-hot-toast';
-import { useRouter } from 'next/router';
+import { useNavigate } from 'react-router-dom';
 
 interface DeleteTeamModalProps {
   team: Team;
@@ -23,7 +23,7 @@ export default function DeleteTeamModal({ team, onClose }: DeleteTeamModalProps)
   const [reason, setReason] = useState('');
   const [step, setStep] = useState<'warning' | 'confirm'>('warning');
   
-  const router = useRouter();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
@@ -34,7 +34,7 @@ export default function DeleteTeamModal({ team, onClose }: DeleteTeamModalProps)
       queryClient.invalidateQueries({ queryKey: ['teams'] });
       onClose();
       // Redirect to dashboard as team no longer exists
-      router.push('/dashboard');
+      navigate('/dashboard');
     },
     onError: (error: any) => {
       toast.error(error.message || 'Failed to delete team');

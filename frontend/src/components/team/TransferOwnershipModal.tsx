@@ -12,7 +12,7 @@ import { teamService } from '../../services/teamService';
 import { memberService } from '../../services/memberService';
 import { TransferOwnershipRequest } from '../../types/team';
 import { toast } from 'react-hot-toast';
-import { useRouter } from 'next/router';
+import { useNavigate } from 'react-router-dom';
 
 interface TransferOwnershipModalProps {
   teamId: string;
@@ -24,7 +24,7 @@ export default function TransferOwnershipModal({ teamId, onClose }: TransferOwne
   const [reason, setReason] = useState('');
   const [confirmName, setConfirmName] = useState('');
   
-  const router = useRouter();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const { data: members = [], isLoading } = useQuery({
@@ -43,7 +43,7 @@ export default function TransferOwnershipModal({ teamId, onClose }: TransferOwne
       queryClient.invalidateQueries({ queryKey: ['teams'] });
       onClose();
       // Redirect to team dashboard as user is no longer owner
-      router.push('/dashboard');
+      navigate('/dashboard');
     },
     onError: (error: any) => {
       toast.error(error.message || 'Failed to transfer ownership');

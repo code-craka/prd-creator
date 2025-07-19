@@ -17,6 +17,22 @@ export const createTeamSchema = Joi.object({
   name: Joi.string().min(2).max(100).required(),
 });
 
+export const updateTeamSchema = Joi.object({
+  name: Joi.string().min(2).max(100).optional(),
+  description: Joi.string().max(500).optional().allow(''),
+  avatar_url: Joi.string().uri().optional().allow(''),
+});
+
+export const transferOwnershipSchema = Joi.object({
+  newOwnerId: Joi.string().uuid().required(),
+  reason: Joi.string().max(500).optional(),
+});
+
+export const deleteTeamSchema = Joi.object({
+  confirmName: Joi.string().required(),
+  reason: Joi.string().max(500).optional(),
+});
+
 export const inviteMemberSchema = Joi.object({
   email: Joi.string().email().required(),
 });
