@@ -562,7 +562,7 @@ class EmailMarketingService {
         open_rate: campaign.sent_count > 0 ? (campaign.opened_count / campaign.sent_count) * 100 : 0,
         click_rate: campaign.opened_count > 0 ? (campaign.clicked_count / campaign.opened_count) * 100 : 0
       })),
-      subscriber_growth: subscriberGrowth.map(day => ({
+      subscriber_growth: subscriberGrowth.map((day: any) => ({
         date: day.date,
         new_subscribers: parseInt(day.new_subscribers),
         unsubscribes: parseInt(day.unsubscribes),

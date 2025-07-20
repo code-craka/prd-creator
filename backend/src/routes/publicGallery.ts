@@ -2,9 +2,9 @@ import express from 'express';
 import { body, param, query } from 'express-validator';
 import { requireAuth } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
-import { asyncWrapper } from '../utils/asyncWrapper';
+import { asyncWrapper } from '../utils/helpers';
 import { publicGalleryService } from '../services/publicGalleryService';
-import { AuthenticatedRequest } from '../types/auth';
+import { AuthenticatedRequest } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -29,8 +29,8 @@ router.get('/prds',
       tags: req.query.tags as string[],
       search: req.query.search as string,
       sort_by: req.query.sort_by as any,
-      page: req.query.page as number || 1,
-      limit: req.query.limit as number || 12
+      page: typeof req.query.page === 'string' ? parseInt(req.query.page) : 1,
+      limit: typeof req.query.limit === 'string' ? parseInt(req.query.limit) : 12
     };
 
     const result = await publicGalleryService.getPublicPRDs(filters);

@@ -375,7 +375,7 @@ class BlogService {
       .orderBy('post_count', 'desc');
 
     return categories.map(cat => ({
-      category: cat.category,
+      category: String(cat.category),
       post_count: parseInt(cat.post_count as string)
     }));
   }
@@ -391,7 +391,7 @@ class BlogService {
       .limit(limit);
 
     return tags.map(tag => ({
-      tag: tag.tag,
+      tag: String(tag.tag),
       count: parseInt(tag.count as string)
     }));
   }

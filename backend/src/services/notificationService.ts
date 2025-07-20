@@ -467,7 +467,7 @@ class NotificationService {
     event: string,
     eventData: Record<string, any>
   ): Promise<boolean> {
-    const criteria = JSON.parse(achievement.criteria || '{}');
+    const criteria = JSON.parse(String(achievement.criteria || '{}'));
 
     // Check different achievement types
     switch (achievement.key) {

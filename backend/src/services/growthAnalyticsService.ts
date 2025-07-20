@@ -279,7 +279,7 @@ class GrowthAnalyticsService {
     ]);
 
     const averageDau = dauResult.length > 0 
-      ? dauResult.reduce((sum, day) => sum + parseInt(day.dau), 0) / dauResult.length 
+      ? dauResult.reduce((sum: number, day: any) => sum + parseInt(day.dau), 0) / dauResult.length 
       : 0;
 
     const mau = parseInt(mauResult?.count as string || '0');
@@ -335,7 +335,7 @@ class GrowthAnalyticsService {
           .whereIn('user_id', 
             db('users')
               .select('id')
-              .where(db.raw('DATE_TRUNC(\'month\', created_at)'), cohortMonth)
+              .whereRaw('DATE_TRUNC(\'month\', created_at) = ?', [cohortMonth])
           )
           .whereBetween('created_at', [
             retentionMonth,
@@ -558,7 +558,7 @@ class GrowthAnalyticsService {
       let retainedCount = 0;
 
       for (const user of newUsers) {
-        const retentionDate = new Date(user.created_at.getTime() + days * 24 * 60 * 60 * 1000);
+        const retentionDate = new Date(user.created_at.getTime() + (days as number) * 24 * 60 * 60 * 1000);
         
         if (retentionDate > new Date()) continue; // Skip if retention date is in the future
 

@@ -1,7 +1,7 @@
 import express from 'express';
 import { requireAuth, AuthenticatedRequest } from '../middleware/auth';
 import { authService } from '../services/authService';
-import { validateBody } from '../utils/validation';
+import { validateBody } from '../middleware/validation';
 import { registerSchema, loginSchema } from '../utils/validation';
 import { asyncWrapper } from '../utils/helpers';
 

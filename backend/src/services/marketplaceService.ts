@@ -619,7 +619,7 @@ class MarketplaceService {
         template_count: parseInt(cat.template_count),
         download_count: parseInt(cat.download_count)
       })),
-      revenue_trends: revenueTrends.map(trend => ({
+      revenue_trends: revenueTrends.map((trend: any) => ({
         date: trend.date,
         revenue: parseFloat(trend.revenue || '0'),
         purchases: parseInt(trend.purchases)

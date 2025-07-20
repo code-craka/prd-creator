@@ -453,7 +453,7 @@ class ReferralService {
           ? (parseInt(referrer.conversion_count) / parseInt(referrer.referral_count)) * 100 
           : 0
       })),
-      daily_referrals: dailyStats.map(day => ({
+      daily_referrals: dailyStats.map((day: any) => ({
         date: day.date,
         referrals: parseInt(day.referrals),
         conversions: parseInt(day.conversions)

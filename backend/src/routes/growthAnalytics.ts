@@ -2,9 +2,9 @@ import express from 'express';
 import { query } from 'express-validator';
 import { requireAuth } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
-import { asyncWrapper } from '../utils/asyncWrapper';
+import { asyncWrapper } from '../utils/helpers';
 import { growthAnalyticsService } from '../services/growthAnalyticsService';
-import { AuthenticatedRequest } from '../types/auth';
+import { AuthenticatedRequest } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -17,7 +17,7 @@ router.get('/dashboard',
   validateRequest,
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const timeRange = req.query.timeRange as '7d' | '30d' | '90d' || '30d';
-    
+
     const dashboard = await growthAnalyticsService.getGrowthDashboard(timeRange);
 
     res.json({
@@ -84,7 +84,10 @@ router.get('/trends/:metricType',
     const timeRange = req.query.timeRange as '7d' | '30d' | '90d' || '30d';
     const segment = req.query.segment as string || 'all';
 
-    if (!['viral_coefficient', 'conversion_rate', 'retention'].includes(metricType)) {
+    const validMetricTypes = ['viral_coefficient', 'conversion_rate', 'retention'] as const;
+    type ValidMetricType = typeof validMetricTypes[number];
+
+    if (!validMetricTypes.includes(metricType as ValidMetricType)) {
       return res.status(400).json({
         success: false,
         error: 'Invalid metric type'
@@ -92,7 +95,7 @@ router.get('/trends/:metricType',
     }
 
     const trends = await growthAnalyticsService.getGrowthTrends(
-      metricType as any,
+      metricType as ValidMetricType,
       timeRange,
       segment
     );
@@ -132,7 +135,9 @@ router.post('/track',
   validateRequest,
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const sessionId = req.query.sessionId as string;
-    const eventType = req.query.eventType as any;
+    const validEventTypes = ['page_view', 'signup', 'activation', 'conversion'] as const;
+    type ValidEventType = typeof validEventTypes[number];
+    const eventType = req.query.eventType as ValidEventType;
     const userId = req.user?.id || null;
 
     const eventData = {
