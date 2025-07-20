@@ -43,7 +43,11 @@
     "env": {
       "NODE_ENV": "development",
       "ANTHROPIC_API_KEY": "",
+<<<<<<< HEAD
       "DATABASE_URL": "postgresql://prd_creator_dev:prd_creator_dev@localhost:5432/prd_creator_dev"
+=======
+      "DATABASE_URL": "postgresql://postgres:password@localhost:5432/prd_creator_dev"
+>>>>>>> analytics-dashboard-clean
     },
     "hooks": {
       "PreToolUse": [

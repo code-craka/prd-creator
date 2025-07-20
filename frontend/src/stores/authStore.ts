@@ -1,16 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Team } from '../types/team';
-
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  avatar_url?: string;
-  current_team_id?: string;
-  created_at: string;
-  updated_at: string;
-}
+import { User, Team } from 'prd-creator-shared';
 
 interface AuthState {
   user: User | null;

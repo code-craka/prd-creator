@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuthStore } from '../stores/authStore';
 
 export interface CollaborationUser {
   id: string;
@@ -100,7 +100,7 @@ export interface CollaborationHook {
 }
 
 export const useCollaboration = (prdId?: string): CollaborationHook => {
-  const { user, token } = useAuth();
+  const { user, token } = useAuthStore();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [activeUsers, setActiveUsers] = useState<CollaborationUser[]>([]);

@@ -24,6 +24,8 @@ router.post('/accept/:token',
 // Get invitation details (for preview before accepting)
 router.get('/:token',
   asyncWrapper(async (req: express.Request, res: express.Response) => {
+    const { token } = req.params;
+    
     // This would be a public endpoint to show invitation details
     // Implementation would fetch invitation without requiring auth
     

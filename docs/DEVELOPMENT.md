@@ -7,7 +7,6 @@ This guide provides detailed instructions for setting up and developing the PRD 
 ### Prerequisites
 
 Ensure you have the following installed:
-
 - **Node.js** 18.0+ ([Download](https://nodejs.org/))
 - **PostgreSQL** 14.0+ ([Download](https://www.postgresql.org/download/))
 - **Git** ([Download](https://git-scm.com/))
@@ -16,20 +15,17 @@ Ensure you have the following installed:
 ### Initial Setup
 
 1. **Clone the repository**
-
    ```bash
    git clone https://github.com/code-craka/prd-creator.git
    cd prd-creator
    ```
 
 2. **Install dependencies**
-
    ```bash
    npm install
    ```
 
 3. **Set up PostgreSQL database**
-
    ```bash
    # Create database
    createdb prd_creator_dev
@@ -39,7 +35,6 @@ Ensure you have the following installed:
    ```
 
 4. **Configure environment variables**
-
    ```bash
    # Copy example files
    cp backend/.env.example backend/.env
@@ -50,14 +45,12 @@ Ensure you have the following installed:
    ```
 
 5. **Run database migrations**
-
    ```bash
    cd backend
    npm run db:migrate
    ```
 
 6. **Start development servers**
-
    ```bash
    # Return to root directory
    cd ..
@@ -68,7 +61,7 @@ Ensure you have the following installed:
 
 ## 🏗 Project Structure
 
-```markdown
+```
 prd-creator/
 ├── backend/                    # Node.js API server
 │   ├── src/
@@ -206,13 +199,11 @@ The database follows a normalized design with these main entities:
 ### Migration Best Practices
 
 1. **Always create migrations for schema changes**
-
    ```bash
    npm run db:migrate:make descriptive_migration_name
    ```
 
 2. **Test migrations thoroughly**
-
    ```bash
    # Run migration
    npm run db:migrate
@@ -225,7 +216,6 @@ The database follows a normalized design with these main entities:
    ```
 
 3. **Include proper indexes**
-
    ```typescript
    // Example migration with index
    exports.up = function(knex) {
@@ -245,13 +235,11 @@ The database follows a normalized design with these main entities:
 ### Seeding Data
 
 1. **Create seeds for development**
-
    ```bash
    npm run db:seed:make sample_users
    ```
 
 2. **Run seeds**
-
    ```bash
    npm run db:seed
    ```
@@ -260,7 +248,7 @@ The database follows a normalized design with these main entities:
 
 ### Component Structure
 
-```markdown
+```
 components/
 ├── common/          # Reusable UI components
 ├── layout/          # Layout components
@@ -446,7 +434,6 @@ describe('UserService', () => {
 ### Environment Setup
 
 1. **Production environment variables**
-
    ```bash
    # Backend
    NODE_ENV=production
@@ -458,7 +445,6 @@ describe('UserService', () => {
    ```
 
 2. **Database setup**
-
    ```bash
    # Run migrations in production
    npm run db:migrate
@@ -530,7 +516,6 @@ DEBUG=knex:query npm run dev
 ### Adding a New API Endpoint
 
 1. **Create the route handler**
-
    ```typescript
    // src/routes/example.ts
    router.get('/example', async (req, res) => {
@@ -539,14 +524,12 @@ DEBUG=knex:query npm run dev
    ```
 
 2. **Add to main router**
-
    ```typescript
    // src/app.ts
    app.use('/api/example', exampleRouter);
    ```
 
 3. **Add validation**
-
    ```typescript
    // src/utils/validation.ts
    export const exampleSchema = z.object({
@@ -557,7 +540,6 @@ DEBUG=knex:query npm run dev
 ### Adding a New React Component
 
 1. **Create the component**
-
    ```typescript
    // src/components/Example.tsx
    export const Example: React.FC = () => {
@@ -566,14 +548,12 @@ DEBUG=knex:query npm run dev
    ```
 
 2. **Add to index**
-
    ```typescript
    // src/components/index.ts
    export { Example } from './Example';
    ```
 
 3. **Use in pages**
-
    ```typescript
    import { Example } from '@/components';
    ```
@@ -590,7 +570,7 @@ DEBUG=knex:query npm run dev
 
 - **GitHub Issues**: Report bugs and request features
 - **GitHub Discussions**: Ask questions and share ideas
-- **Email**: <codecraka@gmail.com>
+- **Email**: codecraka@gmail.com
 
 ### Resources
 

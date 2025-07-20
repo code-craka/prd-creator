@@ -10,8 +10,8 @@ export const env = {
   DB_HOST: process.env.DB_HOST || 'localhost',
   DB_PORT: parseInt(process.env.DB_PORT || '5432'),
   DB_NAME: process.env.DB_NAME || 'prd_creator_dev',
-  DB_USER: process.env.DB_USER || 'prd_creator_dev',
-  DB_PASSWORD: process.env.DB_PASSWORD || 'prd_creator_dev',
+  DB_USER: process.env.DB_USER || 'postgres',
+  DB_PASSWORD: process.env.DB_PASSWORD || 'password',
   
   // JWT
   JWT_SECRET: process.env.JWT_SECRET || 'your-super-secret-jwt-key',

@@ -368,7 +368,7 @@ export class TeamService {
     });
   }
 
-  async deleteTeam(teamId: string, userId: string, confirmName: string, reason?: string): Promise<void> {
+  async deleteTeam(teamId: string, userId: string, reason?: string): Promise<void> {
     // Verify user is the owner
     await this.verifyTeamPermission(teamId, userId, ['owner']);
 
@@ -377,11 +377,6 @@ export class TeamService {
     
     if (!team) {
       throw new NotFoundError('Team not found');
-    }
-
-    // Verify team name confirmation
-    if (confirmName !== team.name) {
-      throw new ValidationError('Team name confirmation does not match');
     }
 
     await db.transaction(async (trx) => {
@@ -462,7 +457,6 @@ export class TeamService {
     let slug = baseSlug;
     let counter = 1;
 
-    // eslint-disable-next-line no-constant-condition
     while (true) {
       const existingTeam = await db('teams')
         .where('slug', slug)

@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+<<<<<<< HEAD
 ### 🚀 Added
+=======
+### Added
+>>>>>>> analytics-dashboard-clean
 
 - Real-time collaborative editing
 - Advanced AI prompt engineering
@@ -16,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - API webhooks and integrations
 - Enterprise SSO support
 
+<<<<<<< HEAD
 ## [1.1.0] - 2024-01-18
 
 ### 🚀 Added - Team Administration & Settings
@@ -65,6 +70,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2024-07-18
 
 ### 🚀 Added - Initial Release
+=======
+## [1.0.0] - 2024-07-18
+
+### Added multiple features
+>>>>>>> analytics-dashboard-clean
 
 - **🎉 Initial Release**: Complete PRD Creator application
 - **🤖 AI Integration**: OpenAI GPT-4 and Anthropic Claude integration for PRD generation
@@ -181,14 +191,22 @@ Each release includes:
 
 ## Future Releases
 
+<<<<<<< HEAD
 ### v1.2.0 (Next)
+=======
+### v1.1.0 (Planned)
+>>>>>>> analytics-dashboard-clean
 
 - Enhanced AI prompts and templates
 - Real-time collaboration features
 - Advanced analytics dashboard
 - Performance improvements
 
+<<<<<<< HEAD
 ### v1.3.0 (Planned)
+=======
+### v1.2.0 (Planned)
+>>>>>>> analytics-dashboard-clean
 
 - Mobile app development
 - API webhooks

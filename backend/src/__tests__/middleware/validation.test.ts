@@ -1,0 +1,191 @@
+import { Request, Response, NextFunction } from 'express';
+import { validateRequest } from '../../middleware/validation';
+import { body, param } from 'express-validator';
+
+describe('Validation Middleware', () => {
+  let mockReq: Partial<Request>;
+  let mockRes: Partial<Response>;
+  let mockNext: NextFunction;
+
+  beforeEach(() => {
+    mockReq = {
+      body: {},
+      params: {},
+      query: {}
+    };
+    mockRes = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn()
+    };
+    mockNext = jest.fn();
+  });
+
+  it('should pass validation when data is valid', async () => {
+    const validationRules = [
+      body('email').isEmail(),
+      body('password').isLength({ min: 6 })
+    ];
+
+    mockReq.body = {
+      email: 'test@example.com',
+      password: 'password123'
+    };
+
+    // Mock express-validator to return no errors
+    const mockValidationResult = {
+      isEmpty: () => true,
+      array: () => []
+    };
+
+    jest.doMock('express-validator', () => ({
+      ...jest.requireActual('express-validator'),
+      validationResult: () => mockValidationResult
+    }));
+
+    const middleware = validateRequest(validationRules);
+    await middleware(mockReq as Request, mockRes as Response, mockNext);
+
+    expect(mockNext).toHaveBeenCalled();
+    expect(mockRes.status).not.toHaveBeenCalled();
+  });
+
+  it('should return 400 when validation fails', async () => {
+    const validationRules = [
+      body('email').isEmail(),
+      body('password').isLength({ min: 6 })
+    ];
+
+    mockReq.body = {
+      email: 'invalid-email',
+      password: '123'
+    };
+
+    // Mock express-validator to return errors
+    const mockValidationResult = {
+      isEmpty: () => false,
+      array: () => [
+        { msg: 'Invalid email format', param: 'email' },
+        { msg: 'Password must be at least 6 characters', param: 'password' }
+      ]
+    };
+
+    jest.doMock('express-validator', () => ({
+      ...jest.requireActual('express-validator'),
+      validationResult: () => mockValidationResult
+    }));
+
+    const middleware = validateRequest(validationRules);
+    await middleware(mockReq as Request, mockRes as Response, mockNext);
+
+    expect(mockRes.status).toHaveBeenCalledWith(400);
+    expect(mockRes.json).toHaveBeenCalledWith({
+      error: 'Validation failed',
+      details: expect.arrayContaining([
+        expect.objectContaining({ msg: 'Invalid email format' }),
+        expect.objectContaining({ msg: 'Password must be at least 6 characters' })
+      ])
+    });
+    expect(mockNext).not.toHaveBeenCalled();
+  });
+
+  it('should validate required fields', async () => {
+    const validationRules = [
+      body('name').notEmpty().withMessage('Name is required'),
+      body('email').isEmail().withMessage('Valid email is required')
+    ];
+
+    mockReq.body = {};
+
+    const mockValidationResult = {
+      isEmpty: () => false,
+      array: () => [
+        { msg: 'Name is required', param: 'name' },
+        { msg: 'Valid email is required', param: 'email' }
+      ]
+    };
+
+    jest.doMock('express-validator', () => ({
+      ...jest.requireActual('express-validator'),
+      validationResult: () => mockValidationResult
+    }));
+
+    const middleware = validateRequest(validationRules);
+    await middleware(mockReq as Request, mockRes as Response, mockNext);
+
+    expect(mockRes.status).toHaveBeenCalledWith(400);
+    expect(mockRes.json).toHaveBeenCalledWith({
+      error: 'Validation failed',
+      details: expect.arrayContaining([
+        expect.objectContaining({ msg: 'Name is required' }),
+        expect.objectContaining({ msg: 'Valid email is required' })
+      ])
+    });
+  });
+
+  it('should validate URL parameters', async () => {
+    const validationRules = [
+      param('id').isNumeric().withMessage('ID must be numeric')
+    ];
+
+    mockReq.params = { id: 'invalid' };
+
+    const mockValidationResult = {
+      isEmpty: () => false,
+      array: () => [
+        { msg: 'ID must be numeric', param: 'id' }
+      ]
+    };
+
+    jest.doMock('express-validator', () => ({
+      ...jest.requireActual('express-validator'),
+      validationResult: () => mockValidationResult
+    }));
+
+    const middleware = validateRequest(validationRules);
+    await middleware(mockReq as Request, mockRes as Response, mockNext);
+
+    expect(mockRes.status).toHaveBeenCalledWith(400);
+    expect(mockRes.json).toHaveBeenCalledWith({
+      error: 'Validation failed',
+      details: expect.arrayContaining([
+        expect.objectContaining({ msg: 'ID must be numeric' })
+      ])
+    });
+  });
+
+  it('should handle custom validation messages', async () => {
+    const validationRules = [
+      body('password')
+        .isLength({ min: 8 })
+        .withMessage('Password must be at least 8 characters long')
+        .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
+        .withMessage('Password must contain at least one uppercase letter, one lowercase letter, and one number')
+    ];
+
+    mockReq.body = { password: 'weak' };
+
+    const mockValidationResult = {
+      isEmpty: () => false,
+      array: () => [
+        { msg: 'Password must be at least 8 characters long', param: 'password' },
+        { msg: 'Password must contain at least one uppercase letter, one lowercase letter, and one number', param: 'password' }
+      ]
+    };
+
+    jest.doMock('express-validator', () => ({
+      ...jest.requireActual('express-validator'),
+      validationResult: () => mockValidationResult
+    }));
+
+    const middleware = validateRequest(validationRules);
+    await middleware(mockReq as Request, mockRes as Response, mockNext);
+
+    expect(mockRes.json).toHaveBeenCalledWith({
+      error: 'Validation failed',
+      details: expect.arrayContaining([
+        expect.objectContaining({ msg: 'Password must be at least 8 characters long' }),
+        expect.objectContaining({ msg: 'Password must contain at least one uppercase letter, one lowercase letter, and one number' })
+      ])
+    });
+  });
+});

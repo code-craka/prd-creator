@@ -2,7 +2,6 @@
 # Claude Code local settings
 .claude/settings.local.json
 .claude/transcript-*.jsonl
-.amazonq/mcp.json
 
 # Dependencies
 node_modules/

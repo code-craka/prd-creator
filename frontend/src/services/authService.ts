@@ -1,5 +1,5 @@
 import { api, apiCall, ApiResponse } from './api';
-import { User } from '../stores/authStore';
+import { User } from 'prd-creator-shared';
 
 export interface LoginRequest {
   email: string;

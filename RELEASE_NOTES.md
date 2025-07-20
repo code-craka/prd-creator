@@ -1,12 +1,19 @@
+<<<<<<< HEAD
 # Release Notes - PRD Creator v1.1.0
 
 **Release Date**: January 18, 2024  
+=======
+# Release Notes - PRD Creator v1.0.0
+
+**Release Date**: July 18, 2024  
+>>>>>>> analytics-dashboard-clean
 **Author**: Sayem Abdullah Rihan  
 **GitHub**: [@code-craka](https://github.com/code-craka)  
 **Repository**: [prd-creator](https://github.com/code-craka/prd-creator)
 
 ---
 
+<<<<<<< HEAD
 ## 🎉 Welcome to PRD Creator v1.1.0 - Team Administration Update
 
 We're excited to announce **PRD Creator v1.1.0**, featuring comprehensive team administration and settings management. This major update introduces professional-grade team management capabilities, secure ownership transfer, and enhanced team customization options.
@@ -32,6 +39,30 @@ We're excited to announce **PRD Creator v1.1.0**, featuring comprehensive team a
 - **Enhanced Database Operations**: Improved transaction handling for complex team operations
 - **Comprehensive Activity Logging**: Full audit trail for ownership transfers and team deletions
 - **Advanced Permission Validation**: Robust security checks for all administrative operations
+=======
+## 🎉 Welcome to PRD Creator v1.0.0
+
+We're excited to announce the initial release of **PRD Creator**, a comprehensive AI-powered tool for transforming vague product ideas into professional Product Requirements Documents (PRDs). This release represents months of development and careful consideration of modern product management workflows.
+
+## 🚀 What's New
+
+### ✨ Core Features
+
+#### 🤖 AI-Powered PRD Generation
+- **Dual AI Integration**: Support for both OpenAI GPT-4 and Anthropic Claude
+- **Smart Templates**: Industry-specific templates for different product types
+- **Contextual Generation**: AI understands your product context and team needs
+- **Iterative Refinement**: Continuously improve PRDs with AI suggestions
+
+#### 👥 Team Collaboration
+- **Multi-Team Workspaces**: Organize PRDs by teams and projects
+- **Role-Based Access Control**: 
+  - **Owner**: Full team control and management
+  - **Admin**: Member management and content moderation
+  - **Member**: Content creation and collaboration
+- **Team Switcher**: Seamlessly switch between personal and team workspaces
+- **Member Invitation System**: Invite team members via email
+>>>>>>> analytics-dashboard-clean
 
 #### 🎨 Modern User Experience
 - **Glassmorphism Design**: Beautiful, modern interface with glass-like effects

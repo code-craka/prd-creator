@@ -8,4 +8,3 @@ rulesets:
   - typescript-express
   - typescript-inclusive
   - typescript-node-security
-  - github-actions

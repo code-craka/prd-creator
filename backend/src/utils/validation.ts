@@ -17,39 +17,12 @@ export const createTeamSchema = Joi.object({
   name: Joi.string().min(2).max(100).required(),
 });
 
-export const updateTeamSchema = Joi.object({
-  name: Joi.string().min(2).max(100).optional(),
-  description: Joi.string().max(500).optional().allow(''),
-  avatar_url: Joi.string().uri().optional().allow(''),
-});
-
-export const transferOwnershipSchema = Joi.object({
-  newOwnerId: Joi.string().uuid().required(),
-  reason: Joi.string().max(500).optional(),
-});
-
-export const deleteTeamSchema = Joi.object({
-  confirmName: Joi.string().required(),
-  reason: Joi.string().max(500).optional(),
-});
-
 export const inviteMemberSchema = Joi.object({
   email: Joi.string().email().required(),
 });
 
 export const updateMemberRoleSchema = Joi.object({
-  role: Joi.string().valid('admin', 'member').required(),
-  reason: Joi.string().max(500).optional(),
-});
-
-export const removeMemberSchema = Joi.object({
-  reason: Joi.string().max(500).optional(),
-});
-
-export const createInvitationSchema = Joi.object({
-  email: Joi.string().email().required(),
-  role: Joi.string().valid('admin', 'member').default('member'),
-  message: Joi.string().max(500).optional(),
+  role: Joi.string().valid('owner', 'admin', 'member').required(),
 });
 
 // PRD validation schemas
@@ -100,10 +73,12 @@ export const createTemplateSchema = Joi.object({
   isPublic: Joi.boolean().default(false),
 });
 
-// Helper function to validate request body
-export const validateBody = (schema: Joi.ObjectSchema) => {
+// Generic validation helper that can validate any part of the request
+type ValidationTarget = 'body' | 'query' | 'params';
+
+export const validate = (schema: Joi.ObjectSchema, target: ValidationTarget = 'body') => {
   return (req: any, res: any, next: any) => {
-    const { error, value } = schema.validate(req.body, {
+    const { error, value } = schema.validate(req[target], {
       abortEarly: false,
       stripUnknown: true,
     });
@@ -121,33 +96,12 @@ export const validateBody = (schema: Joi.ObjectSchema) => {
       });
     }
 
-    req.body = value;
+    req[target] = value;
     next();
   };
 };
 
-// Helper function to validate query parameters
-export const validateQuery = (schema: Joi.ObjectSchema) => {
-  return (req: any, res: any, next: any) => {
-    const { error, value } = schema.validate(req.query, {
-      abortEarly: false,
-      stripUnknown: true,
-    });
-
-    if (error) {
-      const errorDetails = error.details.map(detail => ({
-        field: detail.path.join('.'),
-        message: detail.message,
-      }));
-
-      return res.status(400).json({
-        success: false,
-        error: 'Validation error',
-        details: errorDetails,
-      });
-    }
-
-    req.query = value;
-    next();
-  };
-};
+// Convenience helpers for backward compatibility and readability
+export const validateBody = (schema: Joi.ObjectSchema) => validate(schema, 'body');
+export const validateQuery = (schema: Joi.ObjectSchema) => validate(schema, 'query');
+export const validateParams = (schema: Joi.ObjectSchema) => validate(schema, 'params');

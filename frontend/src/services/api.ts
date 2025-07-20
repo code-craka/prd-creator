@@ -70,8 +70,12 @@ export interface ApiResponse<T = any> {
 export const apiCall = async <T>(
   request: () => Promise<AxiosResponse<ApiResponse<T>>>
 ): Promise<T> => {
-  const response = await request();
-  return response.data.data!;
+  try {
+    const response = await request();
+    return response.data.data!;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export default api;
