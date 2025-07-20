@@ -15,6 +15,8 @@ import invitationRoutes from './routes/invitations';
 import analyticsRoutes from './routes/analytics';
 import aiRoutes from './routes/ai';
 import onboardingRoutes from './routes/onboarding';
+import publicGalleryRoutes from './routes/publicGallery';
+import growthAnalyticsRoutes from './routes/growthAnalytics';
 
 const app = express();
 
@@ -64,6 +66,8 @@ app.use('/api/invitations', invitationRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/onboarding', onboardingRoutes);
+app.use('/api/gallery', publicGalleryRoutes);
+app.use('/api/growth', growthAnalyticsRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

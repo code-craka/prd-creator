@@ -351,10 +351,10 @@ export class OnboardingService {
     ]);
 
     return {
-      totalUsers: parseInt(totalUsers?.count || '0'),
-      completedUsers: parseInt(completedUsers?.count || '0'),
-      completionRate: totalUsers?.count ? (completedUsers?.count / totalUsers?.count) * 100 : 0,
-      avgCompletionTimeHours: avgCompletionTime ? parseFloat(avgCompletionTime.avg) / 3600 : 0,
+      totalUsers: parseInt(String(totalUsers?.count || '0')),
+      completedUsers: parseInt(String(completedUsers?.count || '0')),
+      completionRate: totalUsers?.count ? (Number(completedUsers?.count || 0) / Number(totalUsers?.count)) * 100 : 0,
+      avgCompletionTimeHours: avgCompletionTime ? parseFloat(String((avgCompletionTime as any).avg)) / 3600 : 0,
       stepAnalytics
     };
   }
