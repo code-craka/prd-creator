@@ -1,14 +1,14 @@
-import { apiClient } from './api';
+import api from './api';
 import { AIGenerationRequest, AIGenerationResponse } from '../hooks/useAI';
 
 class AIService {
   async generatePRD(request: AIGenerationRequest) {
-    const response = await apiClient.post('/ai/generate-prd', request);
+    const response = await api.post('/ai/generate-prd', request);
     return response.data;
   }
 
   async generateSuggestions(prdId: string, section: string, content: string, context?: string) {
-    const response = await apiClient.post('/ai/suggestions', {
+    const response = await api.post('/ai/suggestions', {
       prdId,
       section,
       content,
@@ -18,7 +18,7 @@ class AIService {
   }
 
   async improveSection(prdId: string, section: string, content: string, feedback: string) {
-    const response = await apiClient.post('/ai/improve-section', {
+    const response = await api.post('/ai/improve-section', {
       prdId,
       section,
       content,
@@ -34,17 +34,17 @@ class AIService {
     visibility?: 'private' | 'team' | 'public';
     templateId?: string;
   }) {
-    const response = await apiClient.post('/ai/create-prd', data);
+    const response = await api.post('/ai/create-prd', data);
     return response.data;
   }
 
   async validateKeys() {
-    const response = await apiClient.get('/ai/validate-keys');
+    const response = await api.get('/ai/validate-keys');
     return response.data;
   }
 
   async getTemplates() {
-    const response = await apiClient.get('/ai/templates');
+    const response = await api.get('/ai/templates');
     return response.data;
   }
 }

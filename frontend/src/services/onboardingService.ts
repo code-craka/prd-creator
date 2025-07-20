@@ -1,4 +1,4 @@
-import { apiClient } from './apiClient';
+import api from './api';
 import {
   OnboardingProgress,
   UserOnboarding,
@@ -16,25 +16,25 @@ class OnboardingService {
 
   // Initialize onboarding for current user
   async initializeOnboarding(): Promise<UserOnboarding> {
-    const response = await apiClient.post(`${this.baseUrl}/initialize`);
+    const response = await api.post(`${this.baseUrl}/initialize`);
     return response.data.data;
   }
 
   // Get current user's onboarding progress
   async getProgress(): Promise<OnboardingProgress> {
-    const response = await apiClient.get(`${this.baseUrl}/progress`);
+    const response = await api.get(`${this.baseUrl}/progress`);
     return response.data.data;
   }
 
   // Update user profile during onboarding
   async updateProfile(profileData: UpdateProfileRequest): Promise<UserOnboarding> {
-    const response = await apiClient.put(`${this.baseUrl}/profile`, profileData);
+    const response = await api.put(`${this.baseUrl}/profile`, profileData);
     return response.data.data;
   }
 
   // Get personalized template recommendations
   async getTemplateRecommendations(limit: number = 10): Promise<TemplateRecommendation[]> {
-    const response = await apiClient.get(`${this.baseUrl}/templates/recommendations`, {
+    const response = await api.get(`${this.baseUrl}/templates/recommendations`, {
       params: { limit }
     });
     return response.data.data;
@@ -42,7 +42,7 @@ class OnboardingService {
 
   // Get all tutorial steps
   async getTutorialSteps(category?: string): Promise<TutorialStep[]> {
-    const response = await apiClient.get(`${this.baseUrl}/tutorial/steps`, {
+    const response = await api.get(`${this.baseUrl}/tutorial/steps`, {
       params: category ? { category } : {}
     });
     return response.data.data;
@@ -50,7 +50,7 @@ class OnboardingService {
 
   // Start a tutorial step
   async startTutorialStep(stepId: string): Promise<void> {
-    await apiClient.post(`${this.baseUrl}/tutorial/steps/${stepId}/start`);
+    await api.post(`${this.baseUrl}/tutorial/steps/${stepId}/start`);
   }
 
   // Complete a tutorial step
@@ -59,28 +59,28 @@ class OnboardingService {
       stepId,
       timeSpentSeconds
     };
-    await apiClient.post(`${this.baseUrl}/tutorial/steps/${stepId}/complete`, payload);
+    await api.post(`${this.baseUrl}/tutorial/steps/${stepId}/complete`, payload);
   }
 
   // Mark first PRD as created
   async markFirstPRDCreated(): Promise<void> {
-    await apiClient.post(`${this.baseUrl}/milestone/first-prd`);
+    await api.post(`${this.baseUrl}/milestone/first-prd`);
   }
 
   // Mark team invitation as sent
   async markTeamInvitationSent(): Promise<void> {
-    await apiClient.post(`${this.baseUrl}/milestone/team-invitation`);
+    await api.post(`${this.baseUrl}/milestone/team-invitation`);
   }
 
   // Get industry classifications
   async getIndustryClassifications(): Promise<IndustryClassification[]> {
-    const response = await apiClient.get(`${this.baseUrl}/classifications/industries`);
+    const response = await api.get(`${this.baseUrl}/classifications/industries`);
     return response.data.data;
   }
 
   // Get company type classifications
   async getCompanyTypeClassifications(): Promise<CompanyTypeClassification[]> {
-    const response = await apiClient.get(`${this.baseUrl}/classifications/company-types`);
+    const response = await api.get(`${this.baseUrl}/classifications/company-types`);
     return response.data.data;
   }
 
@@ -91,17 +91,17 @@ class OnboardingService {
       rating,
       review
     };
-    await apiClient.post(`${this.baseUrl}/templates/${templateId}/rate`, payload);
+    await api.post(`${this.baseUrl}/templates/${templateId}/rate`, payload);
   }
 
   // Skip onboarding
   async skipOnboarding(): Promise<void> {
-    await apiClient.post(`${this.baseUrl}/skip`);
+    await api.post(`${this.baseUrl}/skip`);
   }
 
   // Get onboarding analytics (admin only)
   async getOnboardingAnalytics(timeRange: string = '30d'): Promise<any> {
-    const response = await apiClient.get(`${this.baseUrl}/analytics`, {
+    const response = await api.get(`${this.baseUrl}/analytics`, {
       params: { timeRange }
     });
     return response.data.data;
