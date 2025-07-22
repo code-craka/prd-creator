@@ -2,15 +2,8 @@ import { aiService } from '../../services/aiService';
 import { testHelpers } from '../utils/testHelpers';
 
 // Mock external AI service calls
-jest.mock('../../config/ai', () => ({
-  openai: {
-    chat: {
-      completions: {
-        create: jest.fn()
-      }
-    }
-  }
-}));
+jest.mock('@anthropic-ai/sdk');
+jest.mock('openai');
 
 describe('AI Service', () => {
   beforeEach(async () => {

@@ -2,14 +2,14 @@ import express from 'express';
 import { requireAuth, AuthenticatedRequest } from '../middleware/auth';
 import { authService } from '../services/authService';
 import { validateBody } from '../middleware/validation';
-import { registerSchema, loginSchema } from '../utils/validation';
+import { validationSchemas } from '../schemas/validationSchemas';
 import { asyncWrapper } from '../utils/helpers';
 
 const router = express.Router();
 
 // Register new user
 router.post('/register', 
-  validateBody(registerSchema),
+  validateBody(validationSchemas.auth.register),
   asyncWrapper(async (req: express.Request, res: express.Response) => {
     const { email, name, password } = req.body;
     
@@ -25,7 +25,7 @@ router.post('/register',
 
 // Login user
 router.post('/login',
-  validateBody(loginSchema),
+  validateBody(validationSchemas.auth.login),
   asyncWrapper(async (req: express.Request, res: express.Response) => {
     const { email, password } = req.body;
     

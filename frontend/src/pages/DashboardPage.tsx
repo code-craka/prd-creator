@@ -141,7 +141,7 @@ export const DashboardPage: React.FC = () => {
           </div>
         ) : prds.length > 0 ? (
           <div className="space-y-4">
-            {prds.slice(0, 5).map((prd: any) => (
+            {prds.slice(0, 5).map((prd) => (
               <Link
                 key={prd.id}
                 to={`/prd/${prd.id}`}

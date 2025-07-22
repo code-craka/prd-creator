@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { validateRequest } from '../../middleware/validation';
-import { body, param } from 'express-validator';
+import { validateBody } from '../../middleware/validation';
+import { validationSchemas } from '../../schemas/validationSchemas';
 
 describe('Validation Middleware', () => {
   let mockReq: Partial<Request>;

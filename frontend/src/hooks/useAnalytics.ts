@@ -7,7 +7,12 @@ import {
   TemplateUsageStats, 
   UserEngagementInsights,
   TimeRange,
-  AnalyticsEvent
+  AnalyticsEvent,
+  PRDEventData,
+  TemplateEventData,
+  AIEventData,
+  CollaborationEventData,
+  CommentEventData
 } from '../types/analytics';
 
 interface UseAnalyticsReturn {
@@ -38,19 +43,19 @@ interface UseAnalyticsReturn {
   trackEvent: (event: AnalyticsEvent) => Promise<void>;
   
   // Convenience tracking methods
-  trackPRDCreated: (prdId: string, eventData?: Record<string, any>) => Promise<void>;
-  trackPRDViewed: (prdId: string, eventData?: Record<string, any>) => Promise<void>;
-  trackPRDEdited: (prdId: string, eventData?: Record<string, any>) => Promise<void>;
-  trackCommentAdded: (prdId: string, eventData?: Record<string, any>) => Promise<void>;
-  trackTemplateUsed: (templateName: string, templateType: string, eventData?: Record<string, any>) => Promise<void>;
-  trackAIGeneration: (prdId: string, provider: string, eventData?: Record<string, any>) => Promise<void>;
-  trackCollaborationStarted: (prdId: string, eventData?: Record<string, any>) => Promise<void>;
+  trackPRDCreated: (prdId: string, eventData?: PRDEventData) => Promise<void>;
+  trackPRDViewed: (prdId: string, eventData?: PRDEventData) => Promise<void>;
+  trackPRDEdited: (prdId: string, eventData?: PRDEventData) => Promise<void>;
+  trackCommentAdded: (prdId: string, eventData?: CommentEventData) => Promise<void>;
+  trackTemplateUsed: (templateName: string, templateType: string, eventData?: TemplateEventData) => Promise<void>;
+  trackAIGeneration: (prdId: string, provider: string, eventData?: AIEventData) => Promise<void>;
+  trackCollaborationStarted: (prdId: string, eventData?: CollaborationEventData) => Promise<void>;
   
   // Refresh
   refresh: () => Promise<void>;
 }
 
-export const useAnalytics = (autoLoad: boolean = true): UseAnalyticsReturn => {
+export const useAnalytics = (autoLoad = true): UseAnalyticsReturn => {
   // Data states
   const [dashboardData, setDashboardData] = useState<AnalyticsDashboardData | null>(null);
   const [teamProductivity, setTeamProductivity] = useState<TeamProductivityMetrics | null>(null);
@@ -85,7 +90,6 @@ export const useAnalytics = (autoLoad: boolean = true): UseAnalyticsReturn => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load dashboard data';
       setError(errorMessage);
-      console.error('Failed to load dashboard data:', err);
     } finally {
       setLoadingDashboard(false);
     }
@@ -101,7 +105,6 @@ export const useAnalytics = (autoLoad: boolean = true): UseAnalyticsReturn => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load team productivity data';
       setError(errorMessage);
-      console.error('Failed to load team productivity:', err);
     } finally {
       setLoadingProductivity(false);
     }
@@ -117,7 +120,6 @@ export const useAnalytics = (autoLoad: boolean = true): UseAnalyticsReturn => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load PRD trends';
       setError(errorMessage);
-      console.error('Failed to load PRD trends:', err);
     } finally {
       setLoadingTrends(false);
     }
@@ -133,7 +135,6 @@ export const useAnalytics = (autoLoad: boolean = true): UseAnalyticsReturn => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load template usage';
       setError(errorMessage);
-      console.error('Failed to load template usage:', err);
     } finally {
       setLoadingTemplates(false);
     }
@@ -149,7 +150,6 @@ export const useAnalytics = (autoLoad: boolean = true): UseAnalyticsReturn => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load user engagement';
       setError(errorMessage);
-      console.error('Failed to load user engagement:', err);
     } finally {
       setLoadingEngagement(false);
     }
@@ -160,37 +160,37 @@ export const useAnalytics = (autoLoad: boolean = true): UseAnalyticsReturn => {
     try {
       await analyticsService.trackEvent(event);
     } catch (err) {
-      console.error('Failed to track analytics event:', err);
       // Don't throw error to avoid disrupting user experience
+      // Error logging should be handled by a proper logging service
     }
   }, []);
 
   // Convenience tracking methods
-  const trackPRDCreated = useCallback((prdId: string, eventData?: Record<string, any>) => {
+  const trackPRDCreated = useCallback((prdId: string, eventData?: PRDEventData) => {
     return analyticsService.trackPRDCreated(prdId, eventData);
   }, []);
 
-  const trackPRDViewed = useCallback((prdId: string, eventData?: Record<string, any>) => {
+  const trackPRDViewed = useCallback((prdId: string, eventData?: PRDEventData) => {
     return analyticsService.trackPRDViewed(prdId, eventData);
   }, []);
 
-  const trackPRDEdited = useCallback((prdId: string, eventData?: Record<string, any>) => {
+  const trackPRDEdited = useCallback((prdId: string, eventData?: PRDEventData) => {
     return analyticsService.trackPRDEdited(prdId, eventData);
   }, []);
 
-  const trackCommentAdded = useCallback((prdId: string, eventData?: Record<string, any>) => {
+  const trackCommentAdded = useCallback((prdId: string, eventData?: CommentEventData) => {
     return analyticsService.trackCommentAdded(prdId, eventData);
   }, []);
 
-  const trackTemplateUsed = useCallback((templateName: string, templateType: string, eventData?: Record<string, any>) => {
+  const trackTemplateUsed = useCallback((templateName: string, templateType: string, eventData?: TemplateEventData) => {
     return analyticsService.trackTemplateUsed(templateName, templateType, eventData);
   }, []);
 
-  const trackAIGeneration = useCallback((prdId: string, provider: string, eventData?: Record<string, any>) => {
+  const trackAIGeneration = useCallback((prdId: string, provider: string, eventData?: AIEventData) => {
     return analyticsService.trackAIGeneration(prdId, provider, eventData);
   }, []);
 
-  const trackCollaborationStarted = useCallback((prdId: string, eventData?: Record<string, any>) => {
+  const trackCollaborationStarted = useCallback((prdId: string, eventData?: CollaborationEventData) => {
     return analyticsService.trackCollaborationStarted(prdId, eventData);
   }, []);
 

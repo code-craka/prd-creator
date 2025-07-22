@@ -206,10 +206,10 @@ describe('CollaborativePRDEditor', () => {
       isImproving: false,
       createPRDFromAI: vi.fn(),
       isCreating: false,
-      templates: null,
+      templates: undefined,
       isLoadingTemplates: false,
       validateKeys: vi.fn(),
-      keyValidation: null,
+      keyValidation: undefined,
       error: null,
       clearError: vi.fn()
     });

@@ -1,4 +1,5 @@
 import { db } from '../config/database';
+import { safeParseInt, safeParseFloat } from '../utils/helpers';
 import { viralTrackingService } from './viralTrackingService';
 import { referralService } from './referralService';
 import { emailMarketingService } from './emailMarketingService';
@@ -177,10 +178,10 @@ class GrowthAnalyticsService {
         .first()
     ]);
 
-    const totalVisitors = parseInt(visitors?.count as string || '0');
-    const totalSignups = parseInt(signups?.count as string || '0');
-    const totalActivated = parseInt(activatedUsers?.count as string || '0');
-    const totalPaying = parseInt(payingUsers?.count as string || '0');
+    const totalVisitors = safeParseInt(visitors?.count, 0);
+    const totalSignups = safeParseInt(signups?.count, 0);
+    const totalActivated = safeParseInt(activatedUsers?.count, 0);
+    const totalPaying = safeParseInt(payingUsers?.count, 0);
 
     const visitorToSignup = totalVisitors > 0 ? (totalSignups / totalVisitors) * 100 : 0;
     const signupToActivation = totalSignups > 0 ? (totalActivated / totalSignups) * 100 : 0;
@@ -223,7 +224,7 @@ class GrowthAnalyticsService {
 
     channelData.forEach(channel => {
       const source = channel.utm_source || 'organic';
-      const users = parseInt(channel.users || '0');
+      const users = safeParseInt(channel.users, 0);
       
       if (source.includes('referral') || source.includes('refer')) {
         channels.referral.users += users;

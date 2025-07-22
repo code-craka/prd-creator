@@ -2,7 +2,7 @@ import express from 'express';
 import { body, param, query } from 'express-validator';
 import { requireAuth } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
-import { asyncWrapper } from '../utils/helpers';
+import { asyncWrapper, safeParsePositiveInt } from '../utils/helpers';
 import { onboardingService } from '../services/onboardingService';
 import { AuthenticatedRequest } from '../middleware/auth';
 
@@ -63,7 +63,7 @@ router.get('/templates/recommendations',
   ],
   validateRequest,
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
-    const limit = parseInt(req.query.limit as string) || 10;
+    const limit = safeParsePositiveInt(req.query.limit as string, 10);
     const recommendations = await onboardingService.getTemplateRecommendations(req.user!.id, limit);
     
     res.json({

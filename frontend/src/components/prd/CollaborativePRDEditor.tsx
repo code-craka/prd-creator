@@ -3,11 +3,8 @@ import {
   Users,
   MessageSquare,
   Lightbulb,
-  Eye,
-  EyeOff,
   Loader2,
   CheckCircle,
-  AlertCircle,
   Sparkles
 } from 'lucide-react';
 import { useCollaboration } from '../../hooks/useCollaboration';
@@ -29,24 +26,12 @@ interface UserCursor {
   color: string;
 }
 
-interface SectionComment {
-  id: string;
-  section: string;
-  position: number;
-  content: string;
-  user: {
-    name: string;
-    avatar_url?: string;
-  };
-  resolved: boolean;
-  createdAt: Date;
-}
+
 
 const CollaborativePRDEditor: React.FC<CollaborativePRDEditorProps> = ({
   prdId,
   initialContent,
   onContentChange,
-  onSave,
   isReadOnly = false,
 }) => {
   const [content, setContent] = useState(initialContent);
@@ -55,7 +40,7 @@ const CollaborativePRDEditor: React.FC<CollaborativePRDEditorProps> = ({
   const [showUsers, setShowUsers] = useState(true);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
-  const [userCursors, setUserCursors] = useState<Map<string, UserCursor>>(new Map());
+  const [, setUserCursors] = useState<Map<string, UserCursor>>(new Map());
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const cursorUpdateTimeoutRef = useRef<NodeJS.Timeout>();
 
@@ -70,15 +55,13 @@ const CollaborativePRDEditor: React.FC<CollaborativePRDEditorProps> = ({
     requestAISuggestions,
     onOperationReceived,
     onPresenceUpdate,
-    onCommentAdded,
-    onCommentResolved,
     onUserJoined,
     onUserLeft,
     onAISuggestions,
     onError,
   } = useCollaboration(prdId);
 
-  const { generateSuggestions, isGeneratingSuggestions } = useAI();
+  const { isGeneratingSuggestions } = useAI();
 
   // User colors for cursors and selections
   const userColors = [
@@ -132,7 +115,7 @@ const CollaborativePRDEditor: React.FC<CollaborativePRDEditorProps> = ({
         }
         
         sections[operation.section] = sectionContent;
-        const newContent = reassembleContent(sections);
+        const newContent: string = reassembleContent(sections);
         setContent(newContent);
         onContentChange(newContent);
       }

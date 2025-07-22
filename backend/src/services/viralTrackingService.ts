@@ -1,4 +1,5 @@
 import { db } from '../config/database';
+import { safeParseInt, safeParseFloat } from '../utils/helpers';
 
 export interface ViralAction {
   id: string;
@@ -67,8 +68,8 @@ class ViralTrackingService {
         .first()
     ]);
 
-    const inviteCount = parseInt(invitations?.count as string) || 0;
-    const conversionCount = parseInt(conversions?.count as string) || 0;
+    const inviteCount = safeParseInt(invitations?.count, 0);
+    const conversionCount = safeParseInt(conversions?.count, 0);
 
     if (inviteCount === 0) return 0;
 
@@ -86,7 +87,7 @@ class ViralTrackingService {
       .count('* as count')
       .first();
 
-    const existingUserCount = parseInt(existingUsers?.count as string) || 0;
+    const existingUserCount = safeParseInt(existingUsers?.count, 0);
     if (existingUserCount === 0) return 0;
 
     const viralCoefficient = await this.calculateViralCoefficient(startDate, endDate);
@@ -143,10 +144,10 @@ class ViralTrackingService {
         .first()
     ]);
 
-    const shareCount = parseInt(shares?.count as string) || 0;
-    const clickCount = parseInt(clicks?.count as string) || 0;
-    const signupCount = parseInt(signups?.count as string) || 0;
-    const activationCount = parseInt(activations?.count as string) || 0;
+    const shareCount = safeParseInt(shares?.count, 0);
+    const clickCount = safeParseInt(clicks?.count, 0);
+    const signupCount = safeParseInt(signups?.count, 0);
+    const activationCount = safeParseInt(activations?.count, 0);
 
     const shareToClick = shareCount > 0 ? clickCount / shareCount : 0;
     const clickToSignup = clickCount > 0 ? signupCount / clickCount : 0;
@@ -226,17 +227,17 @@ class ViralTrackingService {
 
         // Calculate viral score (weighted by action type)
         const viralScore = 
-          parseInt(item.total_shares) * 3 +
-          parseInt(item.total_likes) * 1 +
-          parseInt(item.total_clones) * 5;
+          safeParseInt(item.total_shares, 0) * 3 +
+          safeParseInt(item.total_likes, 0) * 1 +
+          safeParseInt(item.total_clones, 0) * 5;
 
         return {
           content_id: item.content_id,
           content_type: item.content_type,
           title,
-          total_shares: parseInt(item.total_shares),
-          total_likes: parseInt(item.total_likes),
-          total_clones: parseInt(item.total_clones),
+          total_shares: safeParseInt(item.total_shares, 0),
+          total_likes: safeParseInt(item.total_likes, 0),
+          total_clones: safeParseInt(item.total_clones, 0),
           viral_score: viralScore
         };
       })
@@ -298,9 +299,9 @@ class ViralTrackingService {
         .limit(5)
     ]);
 
-    const totalShares = parseInt(activity?.total_shares || '0');
-    const totalInvites = parseInt(activity?.total_invites || '0');
-    const totalReferrals = parseInt(referrals?.count as string || '0');
+    const totalShares = safeParseInt(activity?.total_shares, 0);
+    const totalInvites = safeParseInt(activity?.total_invites, 0);
+    const totalReferrals = safeParseInt(referrals?.count, 0);
 
     // Calculate viral score
     const viralScore = totalShares * 2 + totalInvites * 3 + totalReferrals * 5;
@@ -322,7 +323,7 @@ class ViralTrackingService {
           content_id: item.content_id,
           content_type: item.content_type,
           title,
-          share_count: parseInt(item.share_count)
+          share_count: safeParseInt(item.share_count, 0)
         };
       })
     );

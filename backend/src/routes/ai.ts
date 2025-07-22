@@ -1,69 +1,17 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { requireAuth, AuthenticatedRequest } from '../middleware/auth';
 import { aiService } from '../services/aiService';
 import { prdService } from '../services/prdService';
-import { validateBody } from '../utils/validation';
+import { validateBody } from '../middleware/validation';
+import { validationSchemas } from '../schemas/validationSchemas';
 import { asyncWrapper } from '../utils/helpers';
-import Joi from 'joi';
 
-const router = express.Router();
-
-// Validation schemas
-const generatePRDSchema = Joi.object({
-  prompt: Joi.string().min(10).max(2000).required(),
-  prdType: Joi.string().valid('feature', 'product', 'api', 'mobile', 'web', 'enhancement', 'custom').required(),
-  context: Joi.object({
-    company: Joi.string().max(200).optional(),
-    industry: Joi.string().max(200).optional(),
-    targetAudience: Joi.string().max(500).optional(),
-    existingProducts: Joi.array().items(Joi.string().max(200)).max(10).optional(),
-    timeline: Joi.string().max(200).optional(),
-    budget: Joi.string().max(200).optional(),
-    stakeholders: Joi.array().items(Joi.string().max(200)).max(20).optional(),
-    requirements: Joi.array().items(Joi.string().max(500)).max(20).optional(),
-  }).optional(),
-  style: Joi.string().valid('technical', 'business', 'executive', 'detailed', 'concise').optional(),
-  sections: Joi.array().items(Joi.string().max(200)).max(20).optional(),
-  customInstructions: Joi.string().max(1000).optional(),
-  provider: Joi.object({
-    name: Joi.string().valid('anthropic', 'openai').required(),
-    model: Joi.string().required(),
-    maxTokens: Joi.number().min(100).max(8000).required(),
-    temperature: Joi.number().min(0).max(2).required(),
-  }).optional(),
-});
-
-const generateSuggestionsSchema = Joi.object({
-  prdId: Joi.string().uuid().required(),
-  section: Joi.string().required(),
-  content: Joi.string().required(),
-  context: Joi.string().max(1000).optional(),
-});
-
-const improveSectionSchema = Joi.object({
-  prdId: Joi.string().uuid().required(),
-  section: Joi.string().required(),
-  content: Joi.string().required(),
-  feedback: Joi.string().min(10).max(1000).required(),
-});
-
-const createPRDFromAISchema = Joi.object({
-  title: Joi.string().min(1).max(200).required(),
-  aiResponse: Joi.object({
-    content: Joi.string().required(),
-    sections: Joi.object().required(),
-    suggestions: Joi.array().items(Joi.string()).required(),
-    metadata: Joi.object().required(),
-  }).required(),
-  teamId: Joi.string().uuid().optional(),
-  visibility: Joi.string().valid('private', 'team', 'public').default('private'),
-  templateId: Joi.string().uuid().optional(),
-});
+const router = Router();
 
 // Generate PRD using AI
 router.post('/generate-prd',
   requireAuth,
-  validateBody(generatePRDSchema),
+  validateBody(validationSchemas.ai.generatePRD),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const aiResponse = await aiService.generatePRD(req.body, req.body.provider);
     
@@ -78,7 +26,7 @@ router.post('/generate-prd',
 // Generate suggestions for a section
 router.post('/suggestions',
   requireAuth,
-  validateBody(generateSuggestionsSchema),
+  validateBody(validationSchemas.ai.generateSuggestions),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const { prdId, section, content, context } = req.body;
     
@@ -98,7 +46,7 @@ router.post('/suggestions',
 // Improve a section based on feedback
 router.post('/improve-section',
   requireAuth,
-  validateBody(improveSectionSchema),
+  validateBody(validationSchemas.ai.improveSection),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const { prdId, section, content, feedback } = req.body;
     
@@ -118,7 +66,7 @@ router.post('/improve-section',
 // Create PRD from AI-generated content
 router.post('/create-prd',
   requireAuth,
-  validateBody(createPRDFromAISchema),
+  validateBody(validationSchemas.ai.createFromAI),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const { title, aiResponse, teamId, visibility, templateId } = req.body;
     

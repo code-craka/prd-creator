@@ -134,12 +134,10 @@ export const useCollaboration = (prdId?: string): CollaborationHook => {
 
     // Connection handlers
     socketInstance.on('connect', () => {
-      console.log('Connected to collaboration server');
       setIsConnected(true);
     });
 
     socketInstance.on('disconnect', () => {
-      console.log('Disconnected from collaboration server');
       setIsConnected(false);
       setActiveUsers([]);
       setDocumentState(null);

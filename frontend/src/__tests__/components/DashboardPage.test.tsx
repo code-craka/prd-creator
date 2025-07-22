@@ -4,6 +4,7 @@ import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { DashboardPage } from '../../pages/DashboardPage';
+import { PRD } from 'prd-creator-shared';
 
 const mockUser = {
   id: 'test-user-id',
@@ -15,20 +16,25 @@ const mockUser = {
   updated_at: new Date(),
 };
 
-const mockPRD = {
+const createMockPRD = (overrides: Partial<PRD> = {}) => ({
   id: 'test-prd-id',
   user_id: 'test-user-id',
-  team_id: null,
+  team_id: undefined as string | undefined,
   title: 'Test PRD',
   content: 'Test PRD content',
-  metadata: {},
+  metadata: {
+    questions: {},
+    generated_at: new Date(),
+    model: 'test-model'
+  },
   visibility: 'private' as const,
-  share_token: null,
-  template_id: null,
+  share_token: undefined as string | undefined,
+  template_id: undefined as string | undefined,
   view_count: 0,
   created_at: new Date(),
   updated_at: new Date(),
-};
+  ...overrides
+});
 
 // Mock the PRD service
 vi.mock('../../services/prdService', () => ({
@@ -80,7 +86,7 @@ describe('DashboardPage', () => {
     const { prdService } = await import('../../services/prdService');
     vi.mocked(prdService.getUserPRDs).mockResolvedValue({
       data: [],
-      pagination: { page: 1, limit: 10, total: 0, totalPages: 0, hasNext: false, hasPrev: false }
+      pagination: { page: 1, limit: 10, total: 0, pages: 0 }
     });
 
     render(
@@ -94,10 +100,13 @@ describe('DashboardPage', () => {
 
   it('should display total PRDs count', async () => {
     const { prdService } = await import('../../services/prdService');
-    const mockPRDs = [mockPRD, { ...mockPRD, id: 'prd-2' }];
+    const mockPRDs = [
+      createMockPRD(),
+      createMockPRD({ id: 'prd-2' })
+    ];
     vi.mocked(prdService.getUserPRDs).mockResolvedValue({
       data: mockPRDs,
-      pagination: { page: 1, limit: 10, total: 2, totalPages: 1, hasNext: false, hasPrev: false }
+      pagination: { page: 1, limit: 10, total: 2, pages: 1 }
     });
 
     render(
@@ -115,7 +124,7 @@ describe('DashboardPage', () => {
     const { prdService } = await import('../../services/prdService');
     vi.mocked(prdService.getUserPRDs).mockResolvedValue({
       data: [],
-      pagination: { page: 1, limit: 10, total: 0, totalPages: 0, hasNext: false, hasPrev: false }
+      pagination: { page: 1, limit: 10, total: 0, pages: 0 }
     });
 
     render(
@@ -131,13 +140,13 @@ describe('DashboardPage', () => {
   it('should display recent PRDs when available', async () => {
     const { prdService } = await import('../../services/prdService');
     const mockPRDs = [
-      { ...mockPRD, title: 'Recent PRD 1' },
-      { ...mockPRD, id: 'prd-2', title: 'Recent PRD 2' }
+      createMockPRD({ title: 'Recent PRD 1' }),
+      createMockPRD({ id: 'prd-2', title: 'Recent PRD 2' })
     ];
-    
+
     vi.mocked(prdService.getUserPRDs).mockResolvedValue({
       data: mockPRDs,
-      pagination: { page: 1, limit: 10, total: 2, totalPages: 1, hasNext: false, hasPrev: false }
+      pagination: { page: 1, limit: 10, total: 2, pages: 1 }
     });
 
     render(
@@ -156,7 +165,7 @@ describe('DashboardPage', () => {
     const { prdService } = await import('../../services/prdService');
     vi.mocked(prdService.getUserPRDs).mockResolvedValue({
       data: [],
-      pagination: { page: 1, limit: 10, total: 0, totalPages: 0, hasNext: false, hasPrev: false }
+      pagination: { page: 1, limit: 10, total: 0, pages: 0 }
     });
 
     render(
@@ -173,7 +182,7 @@ describe('DashboardPage', () => {
 
   it('should display loading state initially', async () => {
     const { prdService } = await import('../../services/prdService');
-    vi.mocked(prdService.getUserPRDs).mockImplementation(() => new Promise(() => {}));
+    vi.mocked(prdService.getUserPRDs).mockImplementation(() => new Promise(() => { }));
 
     render(
       <TestWrapper>
@@ -188,14 +197,14 @@ describe('DashboardPage', () => {
   it('should show correct PRD visibility badges', async () => {
     const { prdService } = await import('../../services/prdService');
     const mockPRDs = [
-      { ...mockPRD, visibility: 'private' as const },
-      { ...mockPRD, id: 'prd-2', visibility: 'public' as const },
-      { ...mockPRD, id: 'prd-3', visibility: 'team' as const }
+      createMockPRD({ visibility: 'private' as const }),
+      createMockPRD({ id: 'prd-2', visibility: 'public' as const }),
+      createMockPRD({ id: 'prd-3', visibility: 'team' as const })
     ];
-    
+
     vi.mocked(prdService.getUserPRDs).mockResolvedValue({
       data: mockPRDs,
-      pagination: { page: 1, limit: 10, total: 3, totalPages: 1, hasNext: false, hasPrev: false }
+      pagination: { page: 1, limit: 10, total: 3, pages: 1 }
     });
 
     render(

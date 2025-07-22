@@ -3,21 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { authSchemas } from 'prd-creator-shared';
 import { useAuthStore } from '../../stores/authStore';
 import { authService, RegisterRequest } from '../../services/authService';
 import { Eye, EyeOff, FileText, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-
-const registerSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
 
 type RegisterFormData = RegisterRequest & { confirmPassword: string };
 
@@ -32,7 +22,7 @@ export const RegisterPage: React.FC = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(authSchemas.registerWithConfirm),
   });
 
   const registerMutation = useMutation({
@@ -49,7 +39,7 @@ export const RegisterPage: React.FC = () => {
   });
 
   const onSubmit = (data: RegisterFormData) => {
-    const { confirmPassword, ...registerData } = data;
+    const { confirmPassword: _confirmPassword, ...registerData } = data;
     registerMutation.mutate(registerData);
   };
 

@@ -1,66 +1,16 @@
 import express from 'express';
-import Joi from 'joi';
 import { requireAuth, AuthenticatedRequest } from '../middleware/auth';
-import { ValidationError } from '../middleware/errorHandler';
 import { analyticsService } from '../services/analyticsService';
+import { validateBody, validateQuery } from '../middleware/validation';
+import { validationSchemas } from '../schemas/validationSchemas';
+import { asyncWrapper } from '../utils/helpers';
 
 const router = express.Router();
-
-// Validation schemas
-const trackEventSchema = Joi.object({
-  eventType: Joi.string().required(),
-  eventCategory: Joi.string().required(),
-  eventData: Joi.object().optional(),
-  prdId: Joi.string().uuid().optional(),
-  sessionId: Joi.string().optional(),
-});
-
-const analyticsQuerySchema = Joi.object({
-  timeRange: Joi.string().valid('7d', '30d', '90d').default('30d'),
-  teamId: Joi.string().uuid().optional(),
-});
-
-// Simple validation middleware
-const validateBody = (schema: Joi.ObjectSchema) => {
-  return (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const { error } = schema.validate(req.body);
-    if (error) {
-      return res.status(400).json({
-        success: false,
-        error: 'Validation error',
-        details: error.details,
-      });
-    }
-    next();
-  };
-};
-
-const validateQuery = (schema: Joi.ObjectSchema) => {
-  return (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const { error, value } = schema.validate(req.query);
-    if (error) {
-      return res.status(400).json({
-        success: false,
-        error: 'Validation error',
-        details: error.details,
-      });
-    }
-    req.query = value;
-    next();
-  };
-};
-
-// Async wrapper
-const asyncWrapper = (fn: Function) => {
-  return (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
-  };
-};
 
 // Track analytics event
 router.post('/events',
   requireAuth,
-  validateBody(trackEventSchema),
+  validateBody(validationSchemas.analytics.trackEvent),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const { eventType, eventCategory, eventData, prdId, sessionId } = req.body;
     
@@ -86,7 +36,7 @@ router.post('/events',
 // Get team productivity metrics
 router.get('/team-productivity',
   requireAuth,
-  validateQuery(analyticsQuerySchema),
+  validateQuery(validationSchemas.analytics.query),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const { timeRange } = req.query as { timeRange?: string };
     const teamId = req.headers['x-team-id'] as string;
@@ -110,7 +60,7 @@ router.get('/team-productivity',
 // Get PRD creation trends
 router.get('/prd-trends',
   requireAuth,
-  validateQuery(analyticsQuerySchema),
+  validateQuery(validationSchemas.analytics.query),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const { timeRange, teamId } = req.query as { timeRange?: string; teamId?: string };
     const currentTeamId = teamId || req.headers['x-team-id'] as string;
@@ -127,7 +77,7 @@ router.get('/prd-trends',
 // Get template usage statistics
 router.get('/template-usage',
   requireAuth,
-  validateQuery(analyticsQuerySchema),
+  validateQuery(validationSchemas.analytics.query),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.query as { teamId?: string };
     const currentTeamId = teamId || req.headers['x-team-id'] as string;
@@ -144,7 +94,7 @@ router.get('/template-usage',
 // Get user engagement insights
 router.get('/user-engagement',
   requireAuth,
-  validateQuery(analyticsQuerySchema),
+  validateQuery(validationSchemas.analytics.query),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.query as { teamId?: string };
     const currentTeamId = teamId || req.headers['x-team-id'] as string;
@@ -161,17 +111,10 @@ router.get('/user-engagement',
 // Get analytics dashboard overview
 router.get('/dashboard',
   requireAuth,
-  validateQuery(analyticsQuerySchema),
+  validateQuery(validationSchemas.analytics.dashboard),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const { timeRange, teamId } = req.query as { timeRange?: string; teamId?: string };
     const currentTeamId = teamId || req.headers['x-team-id'] as string;
-
-    if (!currentTeamId) {
-      return res.status(400).json({
-        success: false,
-        error: 'Team ID is required',
-      });
-    }
 
     // Get all analytics data in parallel
     const [
@@ -199,34 +142,96 @@ router.get('/dashboard',
   })
 );
 
-// Get analytics summary for multiple teams (admin only)
-router.get('/overview',
+// Get user-specific analytics
+router.get('/my-stats',
   requireAuth,
-  validateQuery(Joi.object({
-    timeRange: Joi.string().valid('7d', '30d', '90d').default('30d'),
-  })),
+  validateQuery(validationSchemas.analytics.query),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
-    // This endpoint could be restricted to admin users in the future
     const { timeRange } = req.query as { timeRange?: string };
-
-    const [
-      globalPrdTrends,
-      globalTemplateUsage,
-      globalUserEngagement,
-    ] = await Promise.all([
-      analyticsService.getPRDTrends(undefined, timeRange as string),
-      analyticsService.getTemplateUsageStats(undefined),
-      analyticsService.getUserEngagementInsights(undefined),
-    ]);
-
+    
+    // This would require a getUserStats method in analyticsService
+    // For now, return basic user data
     res.json({
       success: true,
       data: {
-        globalTrends: globalPrdTrends,
-        popularTemplates: globalTemplateUsage.slice(0, 15),
-        userEngagement: globalUserEngagement,
-        generatedAt: new Date().toISOString(),
+        userId: req.user!.id,
+        timeRange: timeRange || '30d',
+        // Add user-specific analytics here
       },
+    });
+  })
+);
+
+// Get detailed analytics data with filters
+router.get('/detailed',
+  requireAuth,
+  validateQuery(validationSchemas.analytics.query),
+  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+    const { 
+      timeRange, 
+      teamId, 
+      eventType, 
+      eventCategory, 
+      prdId, 
+      page, 
+      limit 
+    } = req.query as { 
+      timeRange?: string;
+      teamId?: string;
+      eventType?: string;
+      eventCategory?: string;
+      prdId?: string;
+      page?: number;
+      limit?: number;
+    };
+    
+    const currentTeamId = teamId || req.headers['x-team-id'] as string;
+
+    // This would require a getDetailedAnalytics method in analyticsService
+    // For now, return basic data structure
+    res.json({
+      success: true,
+      data: {
+        filters: {
+          timeRange: timeRange || '30d',
+          teamId: currentTeamId,
+          eventType,
+          eventCategory,
+          prdId,
+        },
+        pagination: {
+          page: page || 1,
+          limit: limit || 50,
+        },
+        events: [], // Would contain filtered analytics events
+      },
+    });
+  })
+);
+
+// Export custom analytics report
+router.post('/export',
+  requireAuth,
+  validateBody(validationSchemas.analytics.query),
+  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+    const { timeRange, teamId, eventType, eventCategory } = req.body;
+    const currentTeamId = teamId || req.headers['x-team-id'] as string;
+
+    // This would require an exportAnalytics method in analyticsService
+    // For now, return export confirmation
+    res.json({
+      success: true,
+      data: {
+        exportId: `export_${Date.now()}`,
+        status: 'generating',
+        filters: {
+          timeRange,
+          teamId: currentTeamId,
+          eventType,
+          eventCategory,
+        },
+      },
+      message: 'Analytics export initiated',
     });
   })
 );

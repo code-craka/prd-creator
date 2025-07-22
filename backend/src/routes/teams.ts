@@ -3,8 +3,8 @@ import { requireAuth, AuthenticatedRequest } from '../middleware/auth';
 import { teamService } from '../services/teamService';
 import { prdService } from '../services/prdService';
 import { memberService } from '../services/memberService';
-import { validateBody, validateQuery } from '../utils/validation';
-import { createTeamSchema, inviteMemberSchema, updateMemberRoleSchema, prdFiltersSchema } from '../utils/validation';
+import { validateBody, validateQuery } from '../middleware/validation';
+import { validationSchemas } from '../schemas/validationSchemas';
 import { asyncWrapper } from '../utils/helpers';
 
 const router = express.Router();
@@ -12,7 +12,7 @@ const router = express.Router();
 // Create new team
 router.post('/', 
   requireAuth,
-  validateBody(createTeamSchema),
+  validateBody(validationSchemas.team.create),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const { name } = req.body;
     
@@ -252,7 +252,7 @@ router.get('/:teamId/role-history',
 // Invite team member (legacy)
 router.post('/:teamId/invite',
   requireAuth,
-  validateBody(inviteMemberSchema),
+  validateBody(validationSchemas.team.inviteMember),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.params;
     const { email } = req.body;
@@ -269,7 +269,7 @@ router.post('/:teamId/invite',
 // Get team PRDs
 router.get('/:teamId/prds',
   requireAuth,
-  validateQuery(prdFiltersSchema),
+  validateQuery(validationSchemas.prd.filters),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.params;
     

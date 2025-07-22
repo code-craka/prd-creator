@@ -68,9 +68,9 @@ export class AIService {
     const selectedProvider = provider || this.defaultProvider;
 
     try {
-      const prompt = this.buildPrompt(request);
+      const prompt = AIService.buildPrompt(request);
       
-      let response: any;
+      let response: Anthropic.Messages.Message | OpenAI.Chat.Completions.ChatCompletion;
       let tokensUsed = 0;
 
       if (selectedProvider.name === 'anthropic') {
@@ -112,11 +112,11 @@ export class AIService {
         ? (response.content[0] && 'text' in response.content[0] ? response.content[0].text : '')
         : response.choices[0]?.message?.content || '';
 
-      return this.parseAIResponse(content, {
+      return AIService.parseAIResponse(content, {
         model: selectedProvider.model,
         tokensUsed,
         generationTime,
-        confidence: this.calculateConfidence(content, request),
+        confidence: AIService.calculateConfidence(content, request),
       });
 
     } catch (error) {
@@ -127,7 +127,7 @@ export class AIService {
   }
 
   async generateSuggestions(currentContent: string, section: string, context?: string): Promise<string[]> {
-    const prompt = this.buildSuggestionsPrompt(currentContent, section, context);
+    const prompt = AIService.buildSuggestionsPrompt(currentContent, section, context);
     
     try {
       const response = await this.anthropic.messages.create({
@@ -143,7 +143,7 @@ export class AIService {
       });
 
       const content = response.content[0] && 'text' in response.content[0] ? response.content[0].text : '';
-      return this.parseSuggestions(content);
+      return AIService.parseSuggestions(content);
     } catch (error) {
       console.error('AI Suggestions Error:', error);
       return [];
@@ -151,7 +151,7 @@ export class AIService {
   }
 
   async improveSection(content: string, section: string, feedback: string): Promise<string> {
-    const prompt = this.buildImprovementPrompt(content, section, feedback);
+    const prompt = AIService.buildImprovementPrompt(content, section, feedback);
     
     try {
       const response = await this.anthropic.messages.create({
@@ -173,7 +173,7 @@ export class AIService {
     }
   }
 
-  private buildPrompt(request: AIGenerationRequest): string {
+  private static buildPrompt(request: AIGenerationRequest): string {
     const { prompt, prdType, context, style = 'detailed', sections, customInstructions } = request;
 
     const typeTemplates = {
@@ -259,7 +259,7 @@ Begin the PRD now:
     `.trim();
   }
 
-  private buildSuggestionsPrompt(currentContent: string, section: string, context?: string): string {
+  private static buildSuggestionsPrompt(currentContent: string, section: string, context?: string): string {
     return `
 You are an expert product manager reviewing a PRD section. Provide 3-5 specific, actionable suggestions to improve this section.
 
@@ -291,7 +291,7 @@ Begin your suggestions:
     `.trim();
   }
 
-  private buildImprovementPrompt(content: string, section: string, feedback: string): string {
+  private static buildImprovementPrompt(content: string, section: string, feedback: string): string {
     return `
 You are an expert product manager improving a specific section of a PRD based on feedback.
 
@@ -317,7 +317,7 @@ Begin the improved section:
     `.trim();
   }
 
-  private parseAIResponse(content: string, metadata: any): AIGenerationResponse {
+  private static parseAIResponse(content: string, metadata: Record<string, unknown>): AIGenerationResponse {
     const sections: { [key: string]: string } = {};
     const suggestions: string[] = [];
 
@@ -373,12 +373,12 @@ Begin the improved section:
     };
   }
 
-  private parseSuggestions(content: string): string[] {
+  private static parseSuggestions(content: string): string[] {
     const suggestions: string[] = [];
     const lines = content.split('\n');
 
     for (const line of lines) {
-      if (line.match(/^\d+\./)) {
+      if (/^\d+\./.test(line)) {
         suggestions.push(line.replace(/^\d+\.\s*/, '').trim());
       }
     }
@@ -386,7 +386,7 @@ Begin the improved section:
     return suggestions.slice(0, 5); // Limit to 5 suggestions
   }
 
-  private calculateConfidence(content: string, request: AIGenerationRequest): number {
+  private static calculateConfidence(content: string, request: AIGenerationRequest): number {
     let confidence = 0.8; // Base confidence
 
     // Adjust based on content length

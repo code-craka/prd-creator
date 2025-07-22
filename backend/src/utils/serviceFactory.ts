@@ -30,9 +30,12 @@ export abstract class BaseServiceClass implements BaseService {
     throw error;
   }
 
-  // Common logging
+  // Common logging (use proper logger in production)
   protected log(message: string, data?: any): void {
-    console.log(`[${this.serviceName}] ${message}`, data || '');
+    // TODO: Replace with proper logger (Winston, etc.) in production
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`[${this.serviceName}] ${message}`, data || '');
+    }
   }
 
   // Common validation helper
@@ -51,9 +54,7 @@ export function createService<T extends BaseServiceClass>(
   const service = new ServiceClass(config);
   
   // Add common service lifecycle hooks if needed
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`[ServiceFactory] Created service: ${config.serviceName}`);
-  }
+  // Service creation logging only in development
   
   return service;
 }

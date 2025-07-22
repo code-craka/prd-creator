@@ -3,14 +3,15 @@ import { render, RenderOptions } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { vi } from 'vitest';
+import { User } from 'prd-creator-shared';
 
 // Mock user data
-export const mockUser = {
+export const mockUser: User = {
   id: 'test-user-id',
   email: 'test@example.com',
   name: 'Test User',
   avatar_url: undefined,
-  current_team_id: undefined,
+  current_team_id: 'test-team-id',
   created_at: new Date(),
   updated_at: new Date(),
 };
@@ -54,7 +55,7 @@ vi.mock('../../contexts/AuthContext', () => ({
 // Custom render function with providers
 interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   initialEntries?: string[];
-  user?: any;
+  user?: User;
 }
 
 export function renderWithProviders(
@@ -88,10 +89,12 @@ export function renderWithProviders(
 }
 
 // Mock API responses
-export const mockApiResponse = (data: any) => ({
-  success: true,
-  data,
-});
+export function mockApiResponse<T>(data: T) {
+  return {
+    success: true,
+    data,
+  };
+}
 
 export const mockApiError = (message: string, status = 400) => ({
   success: false,

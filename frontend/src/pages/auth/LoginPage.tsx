@@ -3,16 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { authSchemas } from 'prd-creator-shared';
 import { useAuthStore } from '../../stores/authStore';
 import { authService, LoginRequest } from '../../services/authService';
 import { Eye, EyeOff, FileText, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-
-const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-});
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -24,7 +19,7 @@ export const LoginPage: React.FC = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginRequest>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(authSchemas.login),
   });
 
   const loginMutation = useMutation({

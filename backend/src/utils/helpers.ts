@@ -52,6 +52,40 @@ export const formatDate = (date: Date): string => {
   return date.toISOString();
 };
 
+// Safe parsing utilities
+export const safeParseInt = (value: string | number | undefined | null, defaultValue = 0): number => {
+  if (value === null || value === undefined) {
+    return defaultValue;
+  }
+  
+  const stringValue = String(value).trim();
+  if (stringValue === '') {
+    return defaultValue;
+  }
+  
+  const parsed = parseInt(stringValue, 10);
+  return isNaN(parsed) ? defaultValue : parsed;
+};
+
+export const safeParseFloat = (value: string | number | undefined | null, defaultValue = 0): number => {
+  if (value === null || value === undefined) {
+    return defaultValue;
+  }
+  
+  const stringValue = String(value).trim();
+  if (stringValue === '') {
+    return defaultValue;
+  }
+  
+  const parsed = parseFloat(stringValue);
+  return isNaN(parsed) ? defaultValue : parsed;
+};
+
+export const safeParsePositiveInt = (value: string | number | undefined | null, defaultValue = 1): number => {
+  const parsed = safeParseInt(value, defaultValue);
+  return Math.max(1, parsed);
+};
+
 // Pagination utilities
 export const getPaginationInfo = (page: number, limit: number, total: number) => {
   const totalPages = Math.ceil(total / limit);

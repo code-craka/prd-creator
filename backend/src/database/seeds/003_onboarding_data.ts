@@ -15,8 +15,8 @@ export async function seed(knex: Knex): Promise<void> {
       industry_key: 'technology',
       industry_name: 'Technology & Software',
       description: 'Software development, SaaS, mobile apps, and tech platforms',
-      typical_prd_types: ['feature', 'product', 'api', 'mobile', 'web'],
-      recommended_templates: [],
+      typical_prd_types: JSON.stringify(['feature', 'product', 'api', 'mobile', 'web']),
+      recommended_templates: JSON.stringify([]),
       is_active: true,
       sort_order: 1
     },
@@ -24,8 +24,8 @@ export async function seed(knex: Knex): Promise<void> {
       industry_key: 'healthcare',
       industry_name: 'Healthcare & Medical',
       description: 'Medical devices, health apps, telemedicine, and healthcare platforms',
-      typical_prd_types: ['product', 'mobile', 'web', 'api'],
-      recommended_templates: [],
+      typical_prd_types: JSON.stringify(['product', 'mobile', 'web', 'api']),
+      recommended_templates: JSON.stringify([]),
       is_active: true,
       sort_order: 2
     },
@@ -33,8 +33,8 @@ export async function seed(knex: Knex): Promise<void> {
       industry_key: 'finance',
       industry_name: 'Financial Services',
       description: 'Banking, fintech, investment platforms, and financial applications',
-      typical_prd_types: ['feature', 'web', 'mobile', 'api'],
-      recommended_templates: [],
+      typical_prd_types: JSON.stringify(['feature', 'web', 'mobile', 'api']),
+      recommended_templates: JSON.stringify([]),
       is_active: true,
       sort_order: 3
     },
@@ -42,8 +42,8 @@ export async function seed(knex: Knex): Promise<void> {
       industry_key: 'ecommerce',
       industry_name: 'E-commerce & Retail',
       description: 'Online stores, marketplace platforms, and retail technology',
-      typical_prd_types: ['feature', 'web', 'mobile', 'product'],
-      recommended_templates: [],
+      typical_prd_types: JSON.stringify(['feature', 'web', 'mobile', 'product']),
+      recommended_templates: JSON.stringify([]),
       is_active: true,
       sort_order: 4
     },
@@ -51,8 +51,8 @@ export async function seed(knex: Knex): Promise<void> {
       industry_key: 'education',
       industry_name: 'Education & E-learning',
       description: 'Educational platforms, online courses, and learning management systems',
-      typical_prd_types: ['product', 'web', 'mobile', 'feature'],
-      recommended_templates: [],
+      typical_prd_types: JSON.stringify(['product', 'web', 'mobile', 'feature']),
+      recommended_templates: JSON.stringify([]),
       is_active: true,
       sort_order: 5
     },
@@ -60,8 +60,8 @@ export async function seed(knex: Knex): Promise<void> {
       industry_key: 'media',
       industry_name: 'Media & Entertainment',
       description: 'Streaming platforms, content management, and entertainment apps',
-      typical_prd_types: ['product', 'mobile', 'web', 'feature'],
-      recommended_templates: [],
+      typical_prd_types: JSON.stringify(['product', 'mobile', 'web', 'feature']),
+      recommended_templates: JSON.stringify([]),
       is_active: true,
       sort_order: 6
     }
@@ -73,13 +73,13 @@ export async function seed(knex: Knex): Promise<void> {
       type_key: 'startup',
       type_name: 'Startup',
       description: 'Early-stage companies focusing on rapid growth and MVP development',
-      characteristics: {
+      characteristics: JSON.stringify({
         teamSize: 'small',
         movesFast: true,
         resourceConstrained: true,
         experimentalApproach: true
-      },
-      recommended_features: ['ai_generation', 'quick_templates', 'collaboration'],
+      }),
+      recommended_features: JSON.stringify(['ai_generation', 'quick_templates', 'collaboration']),
       is_active: true,
       sort_order: 1
     },
@@ -87,13 +87,13 @@ export async function seed(knex: Knex): Promise<void> {
       type_key: 'enterprise',
       type_name: 'Enterprise',
       description: 'Large organizations with established processes and compliance requirements',
-      characteristics: {
+      characteristics: JSON.stringify({
         teamSize: 'large',
         processOriented: true,
         complianceFocused: true,
         structuredApproach: true
-      },
-      recommended_features: ['analytics', 'team_management', 'detailed_templates'],
+      }),
+      recommended_features: JSON.stringify(['analytics', 'team_management', 'detailed_templates']),
       is_active: true,
       sort_order: 2
     },
@@ -101,13 +101,13 @@ export async function seed(knex: Knex): Promise<void> {
       type_key: 'agency',
       type_name: 'Agency',
       description: 'Service providers working on client projects with diverse requirements',
-      characteristics: {
+      characteristics: JSON.stringify({
         teamSize: 'medium',
         clientFocused: true,
         projectBased: true,
         versatileNeeds: true
-      },
-      recommended_features: ['template_library', 'collaboration', 'customization'],
+      }),
+      recommended_features: JSON.stringify(['template_library', 'collaboration', 'customization']),
       is_active: true,
       sort_order: 3
     },
@@ -115,13 +115,13 @@ export async function seed(knex: Knex): Promise<void> {
       type_key: 'freelancer',
       type_name: 'Freelancer',
       description: 'Individual consultants and independent product managers',
-      characteristics: {
+      characteristics: JSON.stringify({
         teamSize: 'solo',
         timeConstrained: true,
         costSensitive: true,
         efficiencyFocused: true
-      },
-      recommended_features: ['ai_generation', 'quick_templates', 'export_options'],
+      }),
+      recommended_features: JSON.stringify(['ai_generation', 'quick_templates', 'export_options']),
       is_active: true,
       sort_order: 4
     }
@@ -133,7 +133,7 @@ export async function seed(knex: Knex): Promise<void> {
       step_id: 'welcome',
       title: 'Welcome to PRD Creator',
       description: 'Get started with your PRD creation journey',
-      content: {
+      content: JSON.stringify({
         type: 'interactive',
         steps: [
           {
@@ -143,11 +143,11 @@ export async function seed(knex: Knex): Promise<void> {
             content: 'Let\'s get you set up in just a few minutes!'
           }
         ]
-      },
+      }),
       order_index: 1,
       category: 'getting-started',
       estimated_time_minutes: 2,
-      prerequisites: [],
+      prerequisites: JSON.stringify([]),
       is_required: true,
       is_active: true
     },
@@ -155,7 +155,7 @@ export async function seed(knex: Knex): Promise<void> {
       step_id: 'profile-setup',
       title: 'Tell us about yourself',
       description: 'Help us personalize your experience',
-      content: {
+      content: JSON.stringify({
         type: 'interactive',
         steps: [
           {
@@ -165,11 +165,11 @@ export async function seed(knex: Knex): Promise<void> {
             content: 'Select your company type and industry to get personalized recommendations.'
           }
         ]
-      },
+      }),
       order_index: 2,
       category: 'getting-started',
       estimated_time_minutes: 3,
-      prerequisites: ['welcome'],
+      prerequisites: JSON.stringify(['welcome']),
       is_required: true,
       is_active: true
     },
@@ -177,7 +177,7 @@ export async function seed(knex: Knex): Promise<void> {
       step_id: 'dashboard-tour',
       title: 'Dashboard Overview',
       description: 'Learn about your PRD Creator dashboard',
-      content: {
+      content: JSON.stringify({
         type: 'guided',
         steps: [
           {
@@ -193,11 +193,11 @@ export async function seed(knex: Knex): Promise<void> {
             content: 'Use the "+" button to create new PRDs, invite team members, or access templates.'
           }
         ]
-      },
+      }),
       order_index: 3,
       category: 'getting-started',
       estimated_time_minutes: 4,
-      prerequisites: ['profile-setup'],
+      prerequisites: JSON.stringify(['profile-setup']),
       is_required: true,
       is_active: true
     },
@@ -205,7 +205,7 @@ export async function seed(knex: Knex): Promise<void> {
       step_id: 'create-first-prd',
       title: 'Create Your First PRD',
       description: 'Let\'s create your first Product Requirements Document',
-      content: {
+      content: JSON.stringify({
         type: 'interactive',
         steps: [
           {
@@ -221,11 +221,11 @@ export async function seed(knex: Knex): Promise<void> {
             content: 'Just tell us about your product in plain English, and we\'ll generate a professional PRD.'
           }
         ]
-      },
+      }),
       order_index: 4,
       category: 'getting-started',
       estimated_time_minutes: 8,
-      prerequisites: ['dashboard-tour'],
+      prerequisites: JSON.stringify(['dashboard-tour']),
       is_required: true,
       is_active: true
     },
@@ -233,7 +233,7 @@ export async function seed(knex: Knex): Promise<void> {
       step_id: 'collaboration-basics',
       title: 'Collaboration Features',
       description: 'Learn how to work with your team',
-      content: {
+      content: JSON.stringify({
         type: 'guided',
         steps: [
           {
@@ -249,11 +249,11 @@ export async function seed(knex: Knex): Promise<void> {
             content: 'Click anywhere in a PRD to add comments and start discussions.'
           }
         ]
-      },
+      }),
       order_index: 5,
       category: 'collaboration',
       estimated_time_minutes: 5,
-      prerequisites: ['create-first-prd'],
+      prerequisites: JSON.stringify(['create-first-prd']),
       is_required: false,
       is_active: true
     },
@@ -261,7 +261,7 @@ export async function seed(knex: Knex): Promise<void> {
       step_id: 'team-setup',
       title: 'Set Up Your Team',
       description: 'Invite team members and set up collaboration',
-      content: {
+      content: JSON.stringify({
         type: 'interactive',
         steps: [
           {
@@ -277,11 +277,11 @@ export async function seed(knex: Knex): Promise<void> {
             content: 'Owners can manage everything, Admins can invite members, and Members can create and edit PRDs.'
           }
         ]
-      },
+      }),
       order_index: 6,
       category: 'collaboration',
       estimated_time_minutes: 6,
-      prerequisites: ['collaboration-basics'],
+      prerequisites: JSON.stringify(['collaboration-basics']),
       is_required: false,
       is_active: true
     },
@@ -289,7 +289,7 @@ export async function seed(knex: Knex): Promise<void> {
       step_id: 'analytics-introduction',
       title: 'Understanding Analytics',
       description: 'Learn how to track team productivity and insights',
-      content: {
+      content: JSON.stringify({
         type: 'guided',
         steps: [
           {
@@ -305,11 +305,11 @@ export async function seed(knex: Knex): Promise<void> {
             content: 'Use analytics to identify bottlenecks and improve team efficiency.'
           }
         ]
-      },
+      }),
       order_index: 7,
       category: 'advanced',
       estimated_time_minutes: 4,
-      prerequisites: ['team-setup'],
+      prerequisites: JSON.stringify(['team-setup']),
       is_required: false,
       is_active: true
     }
@@ -325,7 +325,7 @@ export async function seed(knex: Knex): Promise<void> {
       industry: 'technology',
       company_type: 'startup',
       complexity_level: 'basic',
-      template_content: {
+      template_content: JSON.stringify({
         sections: [
           {
             id: 'overview',
@@ -384,12 +384,12 @@ export async function seed(knex: Knex): Promise<void> {
           tags: ['mobile', 'feature', 'startup'],
           version: '1.0'
         }
-      },
-      metadata: {
+      }),
+      metadata: JSON.stringify({
         tags: ['mobile', 'feature', 'ios', 'android'],
         estimatedTime: 30,
         difficulty: 'basic'
-      },
+      }),
       is_featured: true,
       usage_count: 125,
       rating: 4.6
@@ -403,7 +403,7 @@ export async function seed(knex: Knex): Promise<void> {
       industry: 'healthcare',
       company_type: 'enterprise',
       complexity_level: 'advanced',
-      template_content: {
+      template_content: JSON.stringify({
         sections: [
           {
             id: 'executive-summary',
@@ -462,12 +462,12 @@ export async function seed(knex: Knex): Promise<void> {
           tags: ['healthcare', 'enterprise', 'compliance'],
           version: '1.0'
         }
-      },
-      metadata: {
+      }),
+      metadata: JSON.stringify({
         tags: ['healthcare', 'hipaa', 'compliance', 'enterprise'],
         estimatedTime: 90,
         difficulty: 'advanced'
-      },
+      }),
       is_featured: true,
       usage_count: 78,
       rating: 4.8
@@ -481,7 +481,7 @@ export async function seed(knex: Knex): Promise<void> {
       industry: 'finance',
       company_type: 'startup',
       complexity_level: 'intermediate',
-      template_content: {
+      template_content: JSON.stringify({
         sections: [
           {
             id: 'api-overview',
@@ -540,12 +540,12 @@ export async function seed(knex: Knex): Promise<void> {
           tags: ['fintech', 'api', 'compliance'],
           version: '1.0'
         }
-      },
-      metadata: {
+      }),
+      metadata: JSON.stringify({
         tags: ['fintech', 'api', 'banking', 'payments'],
         estimatedTime: 60,
         difficulty: 'intermediate'
-      },
+      }),
       is_featured: false,
       usage_count: 92,
       rating: 4.4
@@ -559,7 +559,7 @@ export async function seed(knex: Knex): Promise<void> {
       industry: 'ecommerce',
       company_type: 'enterprise',
       complexity_level: 'intermediate',
-      template_content: {
+      template_content: JSON.stringify({
         sections: [
           {
             id: 'feature-description',
@@ -618,12 +618,12 @@ export async function seed(knex: Knex): Promise<void> {
           tags: ['ecommerce', 'conversion', 'shopping'],
           version: '1.0'
         }
-      },
-      metadata: {
+      }),
+      metadata: JSON.stringify({
         tags: ['ecommerce', 'shopping-cart', 'conversion', 'retail'],
         estimatedTime: 45,
         difficulty: 'intermediate'
-      },
+      }),
       is_featured: true,
       usage_count: 156,
       rating: 4.7

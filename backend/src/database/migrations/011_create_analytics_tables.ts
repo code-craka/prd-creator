@@ -1,8 +1,10 @@
 import type { Knex } from 'knex';
 
 export async function up(knex: Knex): Promise<void> {
-  // Create analytics events table
-  await knex.schema.createTable('analytics_events', (table) => {
+  // Create analytics events table (check if exists first)
+  const hasAnalyticsEvents = await knex.schema.hasTable('analytics_events');
+  if (!hasAnalyticsEvents) {
+    await knex.schema.createTable('analytics_events', (table) => {
     table.uuid('id').primary().defaultTo(knex.raw('gen_random_uuid()'));
     table.uuid('user_id').references('id').inTable('users').onDelete('CASCADE');
     table.uuid('team_id').nullable().references('id').inTable('teams').onDelete('CASCADE');
@@ -22,10 +24,13 @@ export async function up(knex: Knex): Promise<void> {
     table.index(['team_id', 'created_at']);
     table.index(['prd_id', 'created_at']);
     table.index(['created_at']);
-  });
+    });
+  }
 
   // Create team analytics summary table
-  await knex.schema.createTable('team_analytics', (table) => {
+  const hasTeamAnalytics = await knex.schema.hasTable('team_analytics');
+  if (!hasTeamAnalytics) {
+    await knex.schema.createTable('team_analytics', (table) => {
     table.uuid('id').primary().defaultTo(knex.raw('gen_random_uuid()'));
     table.uuid('team_id').notNullable().references('id').inTable('teams').onDelete('CASCADE');
     table.date('date').notNullable();
@@ -41,10 +46,13 @@ export async function up(knex: Knex): Promise<void> {
     // Unique constraint for team per date
     table.unique(['team_id', 'date']);
     table.index(['team_id', 'date']);
-  });
+    });
+  }
 
   // Create user activity summary table
-  await knex.schema.createTable('user_activity', (table) => {
+  const hasUserActivity = await knex.schema.hasTable('user_activity');
+  if (!hasUserActivity) {
+    await knex.schema.createTable('user_activity', (table) => {
     table.uuid('id').primary().defaultTo(knex.raw('gen_random_uuid()'));
     table.uuid('user_id').notNullable().references('id').inTable('users').onDelete('CASCADE');
     table.uuid('team_id').nullable().references('id').inTable('teams').onDelete('CASCADE');
@@ -62,10 +70,13 @@ export async function up(knex: Knex): Promise<void> {
     table.unique(['user_id', 'team_id', 'date']);
     table.index(['user_id', 'date']);
     table.index(['team_id', 'date']);
-  });
+    });
+  }
 
   // Create PRD analytics table
-  await knex.schema.createTable('prd_analytics', (table) => {
+  const hasPrdAnalytics = await knex.schema.hasTable('prd_analytics');
+  if (!hasPrdAnalytics) {
+    await knex.schema.createTable('prd_analytics', (table) => {
     table.uuid('id').primary().defaultTo(knex.raw('gen_random_uuid()'));
     table.uuid('prd_id').notNullable().references('id').inTable('prds').onDelete('CASCADE');
     table.integer('view_count').defaultTo(0);
@@ -82,10 +93,13 @@ export async function up(knex: Knex): Promise<void> {
     // Unique constraint for PRD
     table.unique(['prd_id']);
     table.index(['prd_id']);
-  });
+    });
+  }
 
   // Create template usage analytics
-  await knex.schema.createTable('template_analytics', (table) => {
+  const hasTemplateAnalytics = await knex.schema.hasTable('template_analytics');
+  if (!hasTemplateAnalytics) {
+    await knex.schema.createTable('template_analytics', (table) => {
     table.uuid('id').primary().defaultTo(knex.raw('gen_random_uuid()'));
     table.string('template_name').notNullable();
     table.string('template_type').notNullable(); // 'feature', 'product', 'api', etc.
@@ -99,7 +113,8 @@ export async function up(knex: Knex): Promise<void> {
     table.index(['template_type', 'date']);
     table.index(['team_id', 'date']);
     table.unique(['template_name', 'team_id', 'date']);
-  });
+    });
+  }
 }
 
 export async function down(knex: Knex): Promise<void> {

@@ -1,16 +1,16 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { requireAuth, optionalAuth, AuthenticatedRequest } from '../middleware/auth';
 import { prdService } from '../services/prdService';
-import { validateBody, validateQuery } from '../utils/validation';
-import { createPRDSchema, updatePRDSchema, prdFiltersSchema } from '../utils/validation';
+import { validateBody, validateQuery } from '../middleware/validation';
+import { validationSchemas } from '../schemas/validationSchemas';
 import { asyncWrapper } from '../utils/helpers';
 
-const router = express.Router();
+const router = Router();
 
 // Create new PRD
 router.post('/', 
   requireAuth,
-  validateBody(createPRDSchema),
+  validateBody(validationSchemas.prd.create),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const prd = await prdService.createPRD(req.user.id, req.body);
     
@@ -25,7 +25,7 @@ router.post('/',
 // Get user's PRDs
 router.get('/', 
   requireAuth,
-  validateQuery(prdFiltersSchema),
+  validateQuery(validationSchemas.prd.filters),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const result = await prdService.getUserPRDs(req.user.id, req.query as any);
     
@@ -39,7 +39,7 @@ router.get('/',
 
 // Get public PRDs
 router.get('/public',
-  validateQuery(prdFiltersSchema),
+  validateQuery(validationSchemas.prd.filters),
   asyncWrapper(async (req: express.Request, res: express.Response) => {
     const result = await prdService.getPublicPRDs(req.query as any);
     
@@ -69,7 +69,7 @@ router.get('/:id',
 // Update PRD
 router.put('/:id',
   requireAuth,
-  validateBody(updatePRDSchema),
+  validateBody(validationSchemas.prd.update),
   asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
     const { id } = req.params;
     
