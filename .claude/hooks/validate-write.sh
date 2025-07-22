@@ -1,10 +1,8 @@
 #!/bin/bash
 
-<<<<<<< HEAD
 input=$(cat)
 file_path=$(echo "$input" | jq -r '.tool_input.file_path // .tool_input.path // ""')
 
-=======
 # Read JSON input from stdin
 input=$(cat)
 
@@ -12,7 +10,6 @@ input=$(cat)
 file_path=$(echo "$input" | jq -r '.tool_input.file_path // .tool_input.path // ""')
 
 # Validate file path
->>>>>>> analytics-dashboard-clean
 if [[ "$file_path" == *".env"* ]]; then
     echo "❌ Cannot write to environment files for security" >&2
     exit 2
@@ -28,11 +25,8 @@ if [[ "$file_path" == *"dist/"* ]] || [[ "$file_path" == *"build/"* ]]; then
     exit 2
 fi
 
-<<<<<<< HEAD
 echo "✅ File write validated: $file_path"
 exit 0
-=======
 # Allow the operation
 echo "✅ File write validated: $file_path"
 exit 0
->>>>>>> analytics-dashboard-clean

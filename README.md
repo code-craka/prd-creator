@@ -23,26 +23,18 @@
 
 ## 🎯 Overview
 
-<<<<<<< HEAD
 **PRD Creator** is a modern, AI-powered productivity tool designed to help product managers, entrepreneurs, and development teams transform vague product ideas into clear, professional Product Requirements Documents (PRDs).
-=======
-**PRD Creator** is a modern, AI-powered productivity tool designed to help product managers, entrepreneurs, and development teams transform vague product ideas into clear, professional Product Requirements Documents (PRDs). 
->>>>>>> analytics-dashboard-clean
 
 With team collaboration features, beautiful glassmorphism design, and AI integration, PRD Creator streamlines the product planning process from ideation to execution.
 
 ## ✨ Features
 
 ### 🤖 AI-Powered PRD Generation
-<<<<<<< HEAD
 
-=======
->>>>>>> analytics-dashboard-clean
 - **OpenAI & Anthropic Claude Integration**: Generate comprehensive PRDs from simple ideas
 - **Smart Template System**: Industry-specific templates for different product types
 - **Iterative Refinement**: Continuously improve PRDs with AI suggestions
 
-<<<<<<< HEAD
 ### 👥 Advanced Team Collaboration
 
 - **Multi-Team Workspaces**: Organize PRDs by teams and projects
@@ -64,31 +56,18 @@ With team collaboration features, beautiful glassmorphism design, and AI integra
 
 ### 🎨 Beautiful User Experience
 
-=======
-### 👥 Team Collaboration
-- **Multi-Team Workspaces**: Organize PRDs by teams and projects
-- **Role-Based Access Control**: Owner, Admin, and Member permissions
-- **Real-time Collaboration**: Share and edit PRDs with team members
-- **Member Invitation System**: Invite team members via email
-
-### 🎨 Beautiful User Experience
->>>>>>> analytics-dashboard-clean
 - **Glassmorphism Design**: Modern, elegant interface with glass-like effects
 - **Responsive Layout**: Works seamlessly across desktop and mobile devices
 - **Dark Theme**: Easy on the eyes with animated gradients
 - **Intuitive Navigation**: Clean, organized interface for productivity
 
 ### 🔐 Security & Privacy
-<<<<<<< HEAD
 
-=======
->>>>>>> analytics-dashboard-clean
 - **JWT Authentication**: Secure user authentication and session management
 - **Privacy Controls**: Private, Team, and Public visibility options
 - **Data Protection**: Secure API endpoints with proper validation
 - **Environment-based Configuration**: Separate dev/staging/prod environments
 
-<<<<<<< HEAD
 ### 📊 Comprehensive Analytics Dashboard
 
 - **Team Productivity Metrics**: Real-time tracking of PRD creation, collaboration sessions, and team performance
@@ -99,21 +78,15 @@ With team collaboration features, beautiful glassmorphism design, and AI integra
 - **Performance Optimization**: Data-driven insights for workflow improvement and resource planning
 - **Interactive Visualizations**: Beautiful charts and graphs with real-time data updates
 - **Export & Reporting**: Comprehensive analytics reports for stakeholders and leadership
-=======
-### 📊 Analytics & Insights
 - **Usage Analytics**: Track PRD views, engagement, and team activity
 - **Performance Metrics**: Monitor team productivity and collaboration
 - **Public Gallery**: Showcase PRDs in a community gallery
 - **Export Options**: Multiple export formats for different use cases
->>>>>>> analytics-dashboard-clean
 
 ## 🛠 Tech Stack
 
 ### Backend
-<<<<<<< HEAD
 
-=======
->>>>>>> analytics-dashboard-clean
 - **Runtime**: Node.js 18+ with TypeScript
 - **Framework**: Express.js with async/await patterns
 - **Database**: PostgreSQL with Knex.js migrations
@@ -121,10 +94,7 @@ With team collaboration features, beautiful glassmorphism design, and AI integra
 - **API Documentation**: RESTful API with comprehensive error handling
 
 ### Frontend
-<<<<<<< HEAD
 
-=======
->>>>>>> analytics-dashboard-clean
 - **Framework**: React 18.2+ with TypeScript
 - **Build Tool**: Vite for fast development and optimized builds
 - **State Management**: Zustand for global state + React Query for server state
@@ -133,20 +103,14 @@ With team collaboration features, beautiful glassmorphism design, and AI integra
 - **Forms**: React Hook Form with Zod validation
 
 ### AI & External Services
-<<<<<<< HEAD
 
-=======
->>>>>>> analytics-dashboard-clean
 - **AI Providers**: OpenAI GPT-4 & Anthropic Claude
 - **Email**: Planned integration with Resend for team invitations
 - **File Storage**: Planned integration for document attachments
 - **Analytics**: Planned integration for usage tracking
 
 ### DevOps & Tools
-<<<<<<< HEAD
 
-=======
->>>>>>> analytics-dashboard-clean
 - **Monorepo**: Organized workspace with shared TypeScript types
 - **Development**: Concurrent development servers with hot reload
 - **Testing**: Jest (planned) for unit and integration tests
@@ -155,10 +119,7 @@ With team collaboration features, beautiful glassmorphism design, and AI integra
 ## 🚀 Quick Start
 
 ### Prerequisites
-<<<<<<< HEAD
 
-=======
->>>>>>> analytics-dashboard-clean
 - Node.js 18.0 or higher
 - PostgreSQL 14.0 or higher
 - npm or yarn package manager
@@ -166,29 +127,20 @@ With team collaboration features, beautiful glassmorphism design, and AI integra
 ### Installation
 
 1. **Clone the repository**
-<<<<<<< HEAD
 
-=======
->>>>>>> analytics-dashboard-clean
    ```bash
    git clone https://github.com/code-craka/prd-creator.git
    cd prd-creator
    ```
 
 2. **Install dependencies**
-<<<<<<< HEAD
 
-=======
->>>>>>> analytics-dashboard-clean
    ```bash
    npm install
    ```
 
 3. **Set up the database**
-<<<<<<< HEAD
 
-=======
->>>>>>> analytics-dashboard-clean
    ```bash
    # Create PostgreSQL database
    createdb prd_creator_dev
@@ -199,10 +151,7 @@ With team collaboration features, beautiful glassmorphism design, and AI integra
    ```
 
 4. **Configure environment variables**
-<<<<<<< HEAD
 
-=======
->>>>>>> analytics-dashboard-clean
    ```bash
    # Backend (.env)
    DATABASE_URL=postgresql://username:password@localhost:5432/prd_creator_dev
@@ -215,15 +164,13 @@ With team collaboration features, beautiful glassmorphism design, and AI integra
    ```
 
 5. **Start the development servers**
-<<<<<<< HEAD
 
-=======
->>>>>>> analytics-dashboard-clean
    ```bash
    npm run dev
    ```
 
    This will start:
+
    - Backend API server on `http://localhost:3001`
    - Frontend React app on `http://localhost:3000`
 
@@ -321,20 +268,14 @@ npm run db:migrate:rollback
 ### Environment Setup
 
 1. **Production Database**
-<<<<<<< HEAD
 
-=======
->>>>>>> analytics-dashboard-clean
    ```bash
    # Set up PostgreSQL in production
    DATABASE_URL=postgresql://user:pass@host:5432/prd_creator_prod
    ```
 
 2. **API Keys**
-<<<<<<< HEAD
 
-=======
->>>>>>> analytics-dashboard-clean
    ```bash
    # Add your AI service API keys
    OPENAI_API_KEY=sk-...
@@ -342,10 +283,7 @@ npm run db:migrate:rollback
    ```
 
 3. **Security**
-<<<<<<< HEAD
 
-=======
->>>>>>> analytics-dashboard-clean
    ```bash
    # Generate secure JWT secret
    JWT_SECRET=your-super-secure-secret-key
@@ -391,14 +329,12 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 ## 👨‍💻 Author
 
 **Sayem Abdullah Rihan**
-<<<<<<< HEAD
 
 - GitHub: [@code-craka](https://github.com/code-craka)
 - Email: <codecraka@gmail.com>
-=======
 - GitHub: [@code-craka](https://github.com/code-craka)
-- Email: codecraka@gmail.com
->>>>>>> analytics-dashboard-clean
+- Email: <codecraka@gmail.com>
+
 - LinkedIn: [Connect with me](https://linkedin.com/in/sayem-rihan)
 
 ---
@@ -422,8 +358,5 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 
 <div align="center">
   <strong>Built with ❤️ by Sayem Abdullah Rihan</strong>
-<<<<<<< HEAD
 </div>
-=======
 </div>
->>>>>>> analytics-dashboard-clean
