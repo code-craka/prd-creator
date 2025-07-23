@@ -1,6 +1,6 @@
 import { db } from '../config/database';
 import { generateSlug } from '../utils/slugGenerator';
-import { viralTrackingService } from './viralTrackingService';
+import { ViralTrackingService } from './viralTrackingService';
 
 export interface BlogPost {
   id: string;
@@ -245,7 +245,7 @@ class BlogService {
 
     // Track view if viewer is authenticated
     if (viewerId) {
-      await viralTrackingService.trackAction(viewerId, 'view', 'blog_post', post.id);
+      await ViralTrackingService.trackAction(viewerId, 'view', 'blog_post', post.id);
     }
 
     return {
@@ -348,7 +348,7 @@ class BlogService {
       .increment('share_count', 1);
 
     // Track viral action
-    await viralTrackingService.trackAction(
+    await ViralTrackingService.trackAction(
       userId,
       'share',
       'blog_post',

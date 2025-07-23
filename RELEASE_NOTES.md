@@ -48,7 +48,7 @@ We're excited to announce **PRD Creator v1.1.0**, featuring comprehensive AI int
 #### 👥 Team Collaboration
 
 - **Multi-Team Workspaces**: Organize PRDs by teams and projects
-- **Role-Based Access Control**: 
+- **Role-Based Access Control**:
   - **Owner**: Full team control and management
   - **Admin**: Member management and content moderation
   - **Member**: Content creation and collaboration
@@ -116,7 +116,7 @@ We're excited to announce **PRD Creator v1.1.0**, featuring comprehensive AI int
 
 ## 🏗 Project Structure
 
-```
+```txt
 prd-creator/
 ├── backend/                 # Node.js API server
 │   ├── src/

@@ -1,6 +1,6 @@
 import { db } from '../config/database';
-import { safeParseInt, safeParseFloat } from '../utils/helpers';
-import { viralTrackingService } from './viralTrackingService';
+import { safeParseInt } from '../utils/helpers';
+import { ViralTrackingService, viralTrackingService } from './viralTrackingService';
 import { referralService } from './referralService';
 import { emailMarketingService } from './emailMarketingService';
 
@@ -467,7 +467,7 @@ class GrowthAnalyticsService {
 
   // Private helper methods
   private async calculateViralCoefficient(startDate: Date, endDate: Date): Promise<number> {
-    return viralTrackingService.calculateViralCoefficient(startDate, endDate);
+    return ViralTrackingService.calculateViralCoefficient(startDate, endDate);
   }
 
   private async calculateOrganicGrowthRate(startDate: Date, endDate: Date): Promise<number> {

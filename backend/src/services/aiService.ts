@@ -69,56 +69,18 @@ export class AIService {
 
     try {
       const prompt = AIService.buildPrompt(request);
-      
-      let response: Anthropic.Messages.Message | OpenAI.Chat.Completions.ChatCompletion;
-      let tokensUsed = 0;
-
-      if (selectedProvider.name === 'anthropic') {
-        response = await this.anthropic.messages.create({
-          model: selectedProvider.model,
-          max_tokens: selectedProvider.maxTokens,
-          temperature: selectedProvider.temperature,
-          messages: [
-            {
-              role: 'user',
-              content: prompt,
-            },
-          ],
-        });
-        
-        tokensUsed = response.usage?.input_tokens + response.usage?.output_tokens || 0;
-      } else {
-        response = await this.openai.chat.completions.create({
-          model: selectedProvider.model,
-          messages: [
-            {
-              role: 'system',
-              content: 'You are an expert product manager who creates comprehensive, professional Product Requirements Documents (PRDs).',
-            },
-            {
-              role: 'user',
-              content: prompt,
-            },
-          ],
-          max_tokens: selectedProvider.maxTokens,
-          temperature: selectedProvider.temperature,
-        });
-        
-        tokensUsed = response.usage?.total_tokens || 0;
-      }
-
+      const { response, tokensUsed } = await this.callAIProvider(selectedProvider, prompt);
       const generationTime = Date.now() - startTime;
-      const content = selectedProvider.name === 'anthropic' 
-        ? (response.content[0] && 'text' in response.content[0] ? response.content[0].text : '')
-        : response.choices[0]?.message?.content || '';
-
-      return AIService.parseAIResponse(content, {
+      
+      const content = AIService.extractContentFromResponse(response, selectedProvider.name);
+      const metadata = {
         model: selectedProvider.model,
         tokensUsed,
         generationTime,
         confidence: AIService.calculateConfidence(content, request),
-      });
+      };
 
+      return AIService.parseAIResponse(content, metadata);
     } catch (error) {
       console.error('AI Generation Error:', error);
       const message = error instanceof Error ? error.message : 'Unknown error occurred';
@@ -126,23 +88,65 @@ export class AIService {
     }
   }
 
+  private async callAIProvider(
+    provider: AIProvider, 
+    prompt: string
+  ): Promise<{ response: Anthropic.Messages.Message | OpenAI.Chat.Completions.ChatCompletion; tokensUsed: number }> {
+    let response: Anthropic.Messages.Message | OpenAI.Chat.Completions.ChatCompletion;
+    let tokensUsed = 0;
+
+    if (provider.name === 'anthropic') {
+      response = await this.anthropic.messages.create({
+        model: provider.model,
+        max_tokens: provider.maxTokens,
+        temperature: provider.temperature,
+        messages: [{ role: 'user', content: prompt }],
+      });
+      tokensUsed = response.usage?.input_tokens + response.usage?.output_tokens || 0;
+    } else {
+      response = await this.openai.chat.completions.create({
+        model: provider.model,
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert product manager who creates comprehensive, professional Product Requirements Documents (PRDs).',
+          },
+          { role: 'user', content: prompt },
+        ],
+        max_tokens: provider.maxTokens,
+        temperature: provider.temperature,
+      });
+      tokensUsed = response.usage?.total_tokens || 0;
+    }
+
+    return { response, tokensUsed };
+  }
+
+  private static extractContentFromResponse(
+    response: Anthropic.Messages.Message | OpenAI.Chat.Completions.ChatCompletion,
+    providerName: 'anthropic' | 'openai'
+  ): string {
+    if (providerName === 'anthropic') {
+      const anthropicResponse = response as Anthropic.Messages.Message;
+      return anthropicResponse.content[0] && 'text' in anthropicResponse.content[0] 
+        ? anthropicResponse.content[0].text 
+        : '';
+    } else {
+      const openaiResponse = response as OpenAI.Chat.Completions.ChatCompletion;
+      return openaiResponse.choices[0]?.message?.content || '';
+    }
+  }
+
   async generateSuggestions(currentContent: string, section: string, context?: string): Promise<string[]> {
     const prompt = AIService.buildSuggestionsPrompt(currentContent, section, context);
     
     try {
-      const response = await this.anthropic.messages.create({
+      const content = await this.callAnthropicSimple(prompt, {
         model: 'claude-3-5-haiku-20241022',
-        max_tokens: 1000,
+        maxTokens: 1000,
         temperature: 0.7,
-        messages: [
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
       });
 
-      const content = response.content[0] && 'text' in response.content[0] ? response.content[0].text : '';
       return AIService.parseSuggestions(content);
     } catch (error) {
       console.error('AI Suggestions Error:', error);
@@ -154,28 +158,50 @@ export class AIService {
     const prompt = AIService.buildImprovementPrompt(content, section, feedback);
     
     try {
-      const response = await this.anthropic.messages.create({
+      return await this.callAnthropicSimple(prompt, {
         model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 2000,
+        maxTokens: 2000,
         temperature: 0.3,
-        messages: [
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
       });
-
-      return response.content[0] && 'text' in response.content[0] ? response.content[0].text : content;
     } catch (error) {
       console.error('AI Improvement Error:', error);
       return content;
     }
   }
 
+  private async callAnthropicSimple(
+    prompt: string,
+    config: { model: string; maxTokens: number; temperature: number }
+  ): Promise<string> {
+    const response = await this.anthropic.messages.create({
+      model: config.model,
+      max_tokens: config.maxTokens,
+      temperature: config.temperature,
+      messages: [{ role: 'user', content: prompt }],
+    });
+
+    return response.content[0] && 'text' in response.content[0] ? response.content[0].text : '';
+  }
+
   private static buildPrompt(request: AIGenerationRequest): string {
     const { prompt, prdType, context, style = 'detailed', sections, customInstructions } = request;
 
+    const typeTemplate = this.getTypeTemplate(prdType);
+    const styleGuideline = this.getStyleGuideline(style);
+    const sectionsToInclude = sections || this.getDefaultSections();
+    const contextInfo = this.buildContextInfo(context);
+
+    return this.assemblePrompt({
+      typeTemplate,
+      prompt,
+      contextInfo,
+      styleGuideline,
+      sectionsToInclude,
+      customInstructions,
+    });
+  }
+
+  private static getTypeTemplate(prdType: AIGenerationRequest['prdType']): string {
     const typeTemplates = {
       feature: 'a new feature for an existing product',
       product: 'a completely new product',
@@ -185,7 +211,10 @@ export class AIService {
       enhancement: 'an enhancement to existing functionality',
       custom: 'a custom solution',
     };
+    return typeTemplates[prdType];
+  }
 
+  private static getStyleGuideline(style: AIGenerationRequest['style']): string {
     const styleGuidelines = {
       technical: 'Focus on technical specifications, architecture, and implementation details.',
       business: 'Emphasize business value, market analysis, and stakeholder concerns.',
@@ -193,8 +222,11 @@ export class AIService {
       detailed: 'Include comprehensive details across all sections with thorough analysis.',
       concise: 'Keep sections brief but complete, focusing on essential information.',
     };
+    return styleGuidelines[style || 'detailed'];
+  }
 
-    const defaultSections = [
+  private static getDefaultSections(): string[] {
+    return [
       '1. Executive Summary',
       '2. Problem Statement',
       '3. Goals and Objectives',
@@ -210,12 +242,12 @@ export class AIService {
       '13. Dependencies',
       '14. Appendix',
     ];
+  }
 
-    const sectionsToInclude = sections || defaultSections;
+  private static buildContextInfo(context?: AIGenerationRequest['context']): string {
+    if (!context) return '';
 
-    let contextInfo = '';
-    if (context) {
-      contextInfo = `
+    return `
 **Context Information:**
 ${context.company ? `- Company: ${context.company}` : ''}
 ${context.industry ? `- Industry: ${context.industry}` : ''}
@@ -225,11 +257,21 @@ ${context.timeline ? `- Timeline: ${context.timeline}` : ''}
 ${context.budget ? `- Budget: ${context.budget}` : ''}
 ${context.stakeholders ? `- Stakeholders: ${context.stakeholders.join(', ')}` : ''}
 ${context.requirements ? `- Key Requirements: ${context.requirements.join(', ')}` : ''}
-      `;
-    }
+    `;
+  }
+
+  private static assemblePrompt(params: {
+    typeTemplate: string;
+    prompt: string;
+    contextInfo: string;
+    styleGuideline: string;
+    sectionsToInclude: string[];
+    customInstructions?: string;
+  }): string {
+    const { typeTemplate, prompt, contextInfo, styleGuideline, sectionsToInclude, customInstructions } = params;
 
     return `
-You are an expert product manager creating a comprehensive Product Requirements Document (PRD) for ${typeTemplates[prdType]}.
+You are an expert product manager creating a comprehensive Product Requirements Document (PRD) for ${typeTemplate}.
 
 **Project Description:**
 ${prompt}
@@ -237,7 +279,7 @@ ${prompt}
 ${contextInfo}
 
 **Style Guidelines:**
-${styleGuidelines[style]}
+${styleGuideline}
 
 **Instructions:**
 1. Create a professional PRD following the structure below
@@ -317,9 +359,37 @@ Begin the improved section:
     `.trim();
   }
 
-  private static parseAIResponse(content: string, metadata: Record<string, unknown>): AIGenerationResponse {
+  private static parseAIResponse(
+    content: string, 
+    metadata: {
+      model: string;
+      tokensUsed: number;
+      generationTime: number;
+      confidence: number;
+    }
+  ): AIGenerationResponse {
     const sections: { [key: string]: string } = {};
     const suggestions: string[] = [];
+
+    const { parsedSections, extractedSuggestions } = this.parseContentSections(content);
+    
+    Object.assign(sections, parsedSections);
+    suggestions.push(...extractedSuggestions);
+
+    return {
+      content,
+      sections,
+      suggestions,
+      metadata,
+    };
+  }
+
+  private static parseContentSections(content: string): {
+    parsedSections: { [key: string]: string };
+    extractedSuggestions: string[];
+  } {
+    const parsedSections: { [key: string]: string } = {};
+    const extractedSuggestions: string[] = [];
 
     // Parse sections using markdown headers
     const lines = content.split('\n');
@@ -328,33 +398,52 @@ Begin the improved section:
 
     for (const line of lines) {
       if (line.startsWith('#')) {
-        // Save previous section
-        if (currentSection && currentContent.length > 0) {
-          sections[currentSection] = currentContent.join('\n').trim();
-        }
-        
-        // Start new section
+        this.saveCurrentSection(parsedSections, currentSection, currentContent);
         currentSection = line.replace(/^#+\s*/, '').trim();
         currentContent = [];
-      } else if (line.toLowerCase().includes('suggestions') && currentSection !== 'suggestions') {
-        // Handle suggestions section
-        if (currentSection && currentContent.length > 0) {
-          sections[currentSection] = currentContent.join('\n').trim();
-        }
+      } else if (this.isSuggestionsSection(line, currentSection)) {
+        this.saveCurrentSection(parsedSections, currentSection, currentContent);
         currentSection = 'suggestions';
         currentContent = [];
-      } else if (currentSection === 'suggestions' && line.match(/^\d+\./)) {
-        // Parse numbered suggestions
-        suggestions.push(line.replace(/^\d+\.\s*/, '').trim());
+      } else if (this.isSuggestionItem(line, currentSection)) {
+        extractedSuggestions.push(line.replace(/^\d+\.\s*/, '').trim());
       } else {
         currentContent.push(line);
       }
     }
 
     // Save last section
+    this.finalizeLastSection(parsedSections, extractedSuggestions, currentSection, currentContent);
+
+    return { parsedSections, extractedSuggestions };
+  }
+
+  private static saveCurrentSection(
+    sections: { [key: string]: string },
+    sectionName: string,
+    content: string[]
+  ): void {
+    if (sectionName && content.length > 0) {
+      sections[sectionName] = content.join('\n').trim();
+    }
+  }
+
+  private static isSuggestionsSection(line: string, currentSection: string): boolean {
+    return line.toLowerCase().includes('suggestions') && currentSection !== 'suggestions';
+  }
+
+  private static isSuggestionItem(line: string, currentSection: string): boolean {
+    return currentSection === 'suggestions' && /^\d+\./.test(line);
+  }
+
+  private static finalizeLastSection(
+    sections: { [key: string]: string },
+    suggestions: string[],
+    currentSection: string,
+    currentContent: string[]
+  ): void {
     if (currentSection && currentContent.length > 0) {
       if (currentSection === 'suggestions') {
-        // Extract suggestions from content if not already parsed
         const suggestionContent = currentContent.join('\n');
         const suggestionMatches = suggestionContent.match(/^\d+\.\s*(.+)$/gm);
         if (suggestionMatches) {
@@ -364,13 +453,6 @@ Begin the improved section:
         sections[currentSection] = currentContent.join('\n').trim();
       }
     }
-
-    return {
-      content,
-      sections,
-      suggestions,
-      metadata,
-    };
   }
 
   private static parseSuggestions(content: string): string[] {

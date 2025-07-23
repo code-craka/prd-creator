@@ -1,5 +1,5 @@
 import { db } from '../config/database';
-import { viralTrackingService } from './viralTrackingService';
+import { ViralTrackingService } from './viralTrackingService';
 
 export interface MarketplaceTemplate {
   id: string;
@@ -412,7 +412,7 @@ class MarketplaceService {
       }
 
       // Track viral action
-      await viralTrackingService.trackAction(userId, 'clone', 'template', templateId, {
+      await ViralTrackingService.trackAction(userId, 'clone', 'template', templateId, {
         marketplace: true,
         price: marketplaceTemplate.price
       });
@@ -630,38 +630,49 @@ class MarketplaceService {
   // Get creator profile and stats
   async getCreatorProfile(userId: string): Promise<CreatorProfile> {
     const [stats, topTemplates] = await Promise.all([
-      // Creator statistics
-      db('marketplace_templates as mt')
-        .leftJoin('template_purchases as tp', 'mt.template_id', 'tp.template_id')
-        .select([
-          db.raw('COUNT(DISTINCT mt.template_id) as total_templates'),
-          db.raw('COUNT(tp.id) as total_sales'),
-          db.raw('SUM(tp.price_paid) as total_revenue'),
-          db.raw('AVG(mt.rating_average) as average_rating'),
-          db.raw('SUM(mt.download_count) as total_downloads'),
-          db.raw('COUNT(CASE WHEN mt.is_featured THEN 1 END) as featured_templates')
-        ])
-        .where('mt.creator_id', userId)
-        .where('mt.status', 'approved')
-        .first(),
-
-      // Top templates
-      db('marketplace_templates as mt')
-        .leftJoin('prd_templates as pt', 'mt.template_id', 'pt.id')
-        .leftJoin('template_purchases as tp', 'mt.template_id', 'tp.template_id')
-        .select([
-          'pt.name',
-          'mt.download_count',
-          'mt.rating_average',
-          db.raw('SUM(tp.price_paid) as revenue')
-        ])
-        .where('mt.creator_id', userId)
-        .where('mt.status', 'approved')
-        .groupBy(['pt.id', 'pt.name', 'mt.download_count', 'mt.rating_average'])
-        .orderBy('mt.download_count', 'desc')
-        .limit(5)
+      this.fetchCreatorStatistics(userId),
+      this.fetchTopTemplates(userId)
     ]);
 
+    return this.constructCreatorProfile(userId, stats, topTemplates);
+  }
+
+  private static async fetchCreatorStatistics(userId: string) {
+    return db('marketplace_templates as mt')
+      .leftJoin('template_purchases as tp', 'mt.template_id', 'tp.template_id')
+      .select([
+        db.raw('COUNT(DISTINCT mt.template_id) as total_templates'),
+        db.raw('COUNT(tp.id) as total_sales'),
+        db.raw('SUM(tp.price_paid) as total_revenue'),
+        db.raw('AVG(mt.rating_average) as average_rating'),
+        db.raw('SUM(mt.download_count) as total_downloads'),
+        db.raw('COUNT(CASE WHEN mt.is_featured THEN 1 END) as featured_templates')
+      ])
+      .where('mt.creator_id', userId)
+      .where('mt.status', 'approved')
+      .first();
+  }
+
+  // skipcq: JS-0105
+  private async fetchTopTemplates(userId: string) {
+    return db('marketplace_templates as mt')
+      .leftJoin('prd_templates as pt', 'mt.template_id', 'pt.id')
+      .leftJoin('template_purchases as tp', 'mt.template_id', 'tp.template_id')
+      .select([
+        'pt.name',
+        'mt.download_count',
+        'mt.rating_average',
+        db.raw('SUM(tp.price_paid) as revenue')
+      ])
+      .where('mt.creator_id', userId)
+      .where('mt.status', 'approved')
+      .groupBy(['pt.id', 'pt.name', 'mt.download_count', 'mt.rating_average'])
+      .orderBy('mt.download_count', 'desc')
+      .limit(5);
+  }
+
+  // skipcq: JS-0105
+  private constructCreatorProfile(userId: string, stats: any, topTemplates: any[]) {
     return {
       user_id: userId,
       total_templates: parseInt(stats?.total_templates || '0'),

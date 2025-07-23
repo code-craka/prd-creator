@@ -1,6 +1,6 @@
 import { db } from '../config/database';
 import { generateSlug } from '../utils/slugGenerator';
-import { viralTrackingService } from './viralTrackingService';
+import { ViralTrackingService } from './viralTrackingService';
 
 export interface PublicPRD {
   id: string;
@@ -100,7 +100,7 @@ class PublicGalleryService {
       .returning('*');
 
     // Track viral action
-    await viralTrackingService.trackAction(userId, 'share', 'prd', prdId);
+    await ViralTrackingService.trackAction(userId, 'share', 'prd', prdId);
 
     return publicPRD[0];
   }
@@ -243,7 +243,7 @@ class PublicGalleryService {
 
     // Track view if viewer is authenticated
     if (viewerId) {
-      await viralTrackingService.trackAction(viewerId, 'view', 'prd', prd.prd_id);
+      await ViralTrackingService.trackAction(viewerId, 'view', 'prd', prd.prd_id);
     }
 
     return {
@@ -294,7 +294,7 @@ class PublicGalleryService {
         .increment('like_count', 1);
 
       // Track viral action
-      await viralTrackingService.trackAction(userId, 'like', 'prd', prdId);
+      await ViralTrackingService.trackAction(userId, 'like', 'prd', prdId);
 
       isLiked = true;
     }
@@ -338,7 +338,7 @@ class PublicGalleryService {
       });
 
     // Track viral action
-    await viralTrackingService.trackAction(
+    await ViralTrackingService.trackAction(
       userId, 
       'share', 
       'prd', 
@@ -386,7 +386,7 @@ class PublicGalleryService {
       .increment('clone_count', 1);
 
     // Track viral action
-    await viralTrackingService.trackAction(userId, 'clone', 'prd', prdId);
+    await ViralTrackingService.trackAction(userId, 'clone', 'prd', prdId);
 
     const updatedPrd = await db('public_prds').where('prd_id', prdId).first();
 

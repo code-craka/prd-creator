@@ -23,6 +23,7 @@ export const commonValidators = {
   name: z.string().min(2, 'Name must be at least 2 characters').max(100, 'Name too long'),
   title: z.string().min(1, 'Title is required').max(500, 'Title too long'),
   content: z.string().min(1, 'Content is required'),
+  nonEmptyString: z.string().min(1, 'This field is required').max(500, 'Text too long'),
   visibility: z.enum(['private', 'team', 'public'], { errorMap: () => ({ message: 'Invalid visibility option' }) }),
   role: z.enum(['owner', 'admin', 'member'], { errorMap: () => ({ message: 'Invalid role' }) }),
   

@@ -1,5 +1,5 @@
 import { db } from '../config/database';
-import { safeParseInt, safeParseFloat } from '../utils/helpers';
+import { safeParseInt } from '../utils/helpers';
 
 export interface ViralAction {
   id: string;
@@ -22,14 +22,14 @@ export interface ViralMetrics {
   cycle_time: number; // Average time for viral cycle completion
 }
 
-class ViralTrackingService {
+export class ViralTrackingService {
   // Track viral action
-  async trackAction(
+  static async trackAction(
     userId: string,
     actionType: ViralAction['action_type'],
     contentType: ViralAction['content_type'],
     contentId: string,
-    metadata: Record<string, any> = {}
+    metadata: Record<string, string | number | boolean | null> = {}
   ): Promise<ViralAction> {
     const action = await db('viral_actions')
       .insert({
@@ -47,7 +47,7 @@ class ViralTrackingService {
   }
 
   // Calculate viral coefficient for time period
-  async calculateViralCoefficient(
+  static async calculateViralCoefficient(
     startDate: Date,
     endDate: Date
   ): Promise<number> {
@@ -77,7 +77,7 @@ class ViralTrackingService {
   }
 
   // Calculate K-factor (virality metric)
-  async calculateKFactor(
+  static async calculateKFactor(
     startDate: Date,
     endDate: Date
   ): Promise<number> {
@@ -90,7 +90,7 @@ class ViralTrackingService {
     const existingUserCount = safeParseInt(existingUsers?.count, 0);
     if (existingUserCount === 0) return 0;
 
-    const viralCoefficient = await this.calculateViralCoefficient(startDate, endDate);
+    const viralCoefficient = await ViralTrackingService.calculateViralCoefficient(startDate, endDate);
     
     return viralCoefficient;
   }
@@ -169,10 +169,10 @@ class ViralTrackingService {
   }
 
   // Get top viral content
-  async getTopViralContent(
+  static async getTopViralContent(
     contentType?: ViralAction['content_type'],
     timeRange: '7d' | '30d' | '90d' = '30d',
-    limit: number = 10
+    limit = 10
   ): Promise<Array<{
     content_id: string;
     content_type: string;
@@ -189,10 +189,10 @@ class ViralTrackingService {
       .select([
         'content_id',
         'content_type',
-        db.raw(`COUNT(CASE WHEN action_type = 'share' THEN 1 END) as total_shares`),
-        db.raw(`COUNT(CASE WHEN action_type = 'like' THEN 1 END) as total_likes`),
-        db.raw(`COUNT(CASE WHEN action_type = 'clone' THEN 1 END) as total_clones`),
-        db.raw(`COUNT(*) as total_actions`)
+        db.raw('COUNT(CASE WHEN action_type = \'share\' THEN 1 END) as total_shares'),
+        db.raw('COUNT(CASE WHEN action_type = \'like\' THEN 1 END) as total_likes'),
+        db.raw('COUNT(CASE WHEN action_type = \'clone\' THEN 1 END) as total_clones'),
+        db.raw('COUNT(*) as total_actions')
       ])
       .where('created_at', '>=', startDate)
       .groupBy(['content_id', 'content_type']);
@@ -345,7 +345,7 @@ class ViralTrackingService {
     platform: string,
     additionalData: Record<string, any> = {}
   ): Promise<void> {
-    await this.trackAction(userId, 'share', contentType, contentId, {
+    await ViralTrackingService.trackAction(userId, 'share', contentType, contentId, {
       platform,
       ...additionalData
     });
@@ -357,12 +357,12 @@ class ViralTrackingService {
     endDate: Date
   ): Promise<ViralMetrics> {
     const [viralCoefficient, funnelMetrics, cycleTime] = await Promise.all([
-      this.calculateViralCoefficient(startDate, endDate),
+      ViralTrackingService.calculateViralCoefficient(startDate, endDate),
       this.getViralFunnelMetrics(startDate, endDate),
       this.calculateAverageCycleTime(startDate, endDate)
     ]);
 
-    const kFactor = await this.calculateKFactor(startDate, endDate);
+    const kFactor = await ViralTrackingService.calculateKFactor(startDate, endDate);
 
     return {
       viral_coefficient: viralCoefficient,

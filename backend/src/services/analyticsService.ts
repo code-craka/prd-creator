@@ -6,7 +6,7 @@ export interface AnalyticsEvent {
   prdId?: string;
   eventType: string;
   eventCategory: string;
-  eventData?: Record<string, any>;
+  eventData?: Record<string, unknown>;
   sessionId?: string;
   ipAddress?: string;
   userAgent?: string;
@@ -441,8 +441,8 @@ export class AnalyticsService {
       // Update template analytics
       if (event.eventType === 'template_used' && event.eventData?.templateName) {
         await this.updateTemplateAnalytics(
-          event.eventData.templateName,
-          event.eventData.templateType,
+          event.eventData.templateName as string,
+          event.eventData.templateType as string,
           event.teamId,
           today
         );
