@@ -1,0 +1,315 @@
+{
+  "usage": "Code health rules configuration for PRD Creator - customized for TypeScript/Node.js/React codebase with emphasis on maintainability and team collaboration patterns.",
+  "rule_sets": [
+    {
+      "matching_content_path": "backend/src/**/*.ts",
+      "matching_content_path_doc": "Backend TypeScript files - stricter rules for business logic and API services",
+      "thresholds": [
+        {
+          "name": "function_cyclomatic_complexity_warning",
+          "value": "10"
+        },
+        {
+          "name": "function_cyclomatic_complexity_alert", 
+          "value": "15"
+        },
+        {
+          "name": "function_lines_of_code_warning",
+          "value": "50"
+        },
+        {
+          "name": "function_lines_of_code_alert",
+          "value": "100"
+        },
+        {
+          "name": "function_max_arguments",
+          "value": "5"
+        },
+        {
+          "name": "file_lines_of_code_for_warning",
+          "value": "300"
+        },
+        {
+          "name": "file_lines_of_code_for_alert",
+          "value": "500"
+        },
+        {
+          "name": "constructor_max_arguments",
+          "value": "4"
+        }
+      ],
+      "rules": [
+        {
+          "name": "Brain Method",
+          "weight": 1.0
+        },
+        {
+          "name": "Bumpy Road Ahead", 
+          "weight": 0.8
+        },
+        {
+          "name": "Code Duplication",
+          "weight": 1.2
+        },
+        {
+          "name": "Complex Conditional",
+          "weight": 1.0
+        },
+        {
+          "name": "Complex Method",
+          "weight": 1.0
+        },
+        {
+          "name": "Constructor Over-Injection",
+          "weight": 0.7
+        },
+        {
+          "name": "Deep, Nested Complexity",
+          "weight": 1.0
+        },
+        {
+          "name": "Excess Number of Function Arguments",
+          "weight": 0.9
+        },
+        {
+          "name": "Large Method",
+          "weight": 1.0
+        },
+        {
+          "name": "Lines of Code in a Single File",
+          "weight": 0.8
+        },
+        {
+          "name": "Primitive Obsession",
+          "weight": 0.6
+        },
+        {
+          "name": "String Heavy Function Arguments",
+          "weight": 0.7
+        },
+        {
+          "name": "Overall Code Complexity",
+          "weight": 1.0
+        }
+      ]
+    },
+    {
+      "matching_content_path": "frontend/src/**/*.{ts,tsx}",
+      "matching_content_path_doc": "Frontend React/TypeScript files - balanced rules for UI components",
+      "thresholds": [
+        {
+          "name": "function_cyclomatic_complexity_warning",
+          "value": "12"
+        },
+        {
+          "name": "function_cyclomatic_complexity_alert",
+          "value": "20"
+        },
+        {
+          "name": "function_lines_of_code_warning",
+          "value": "60"
+        },
+        {
+          "name": "function_lines_of_code_alert",
+          "value": "120"
+        },
+        {
+          "name": "function_max_arguments",
+          "value": "6"
+        },
+        {
+          "name": "file_lines_of_code_for_warning",
+          "value": "400"
+        },
+        {
+          "name": "file_lines_of_code_for_alert",
+          "value": "600"
+        }
+      ],
+      "rules": [
+        {
+          "name": "Brain Method",
+          "weight": 1.0
+        },
+        {
+          "name": "Bumpy Road Ahead",
+          "weight": 0.7
+        },
+        {
+          "name": "Code Duplication",
+          "weight": 1.1
+        },
+        {
+          "name": "Complex Conditional",
+          "weight": 0.9
+        },
+        {
+          "name": "Complex Method",
+          "weight": 1.0
+        },
+        {
+          "name": "Deep, Nested Complexity",
+          "weight": 0.8
+        },
+        {
+          "name": "Excess Number of Function Arguments",
+          "weight": 0.8
+        },
+        {
+          "name": "Large Method",
+          "weight": 0.9
+        },
+        {
+          "name": "Lines of Code in a Single File",
+          "weight": 0.7
+        },
+        {
+          "name": "Primitive Obsession",
+          "weight": 0.5
+        },
+        {
+          "name": "String Heavy Function Arguments",
+          "weight": 0.6
+        }
+      ]
+    },
+    {
+      "matching_content_path": "**/__tests__/**/*.{ts,tsx,js}",
+      "matching_content_path_doc": "Test files - relaxed rules for test code patterns",
+      "thresholds": [
+        {
+          "name": "function_cyclomatic_complexity_warning",
+          "value": "15"
+        },
+        {
+          "name": "function_lines_of_code_warning",
+          "value": "80"
+        },
+        {
+          "name": "file_lines_of_code_for_warning",
+          "value": "500"
+        },
+        {
+          "name": "unit_test_consecutive_asserts_for_large_block",
+          "value": "8"
+        },
+        {
+          "name": "unit_test_suite_number_of_large_assertion_blocks",
+          "value": "3"
+        }
+      ],
+      "rules": [
+        {
+          "name": "Brain Method",
+          "weight": 0.6
+        },
+        {
+          "name": "Bumpy Road Ahead",
+          "weight": 0.4
+        },
+        {
+          "name": "Code Duplication",
+          "weight": 0.8
+        },
+        {
+          "name": "Complex Method",
+          "weight": 0.7
+        },
+        {
+          "name": "Large Method",
+          "weight": 0.6
+        },
+        {
+          "name": "Lines of Code in a Single File",
+          "weight": 0.5
+        },
+        {
+          "name": "Duplicated Assertion Blocks",
+          "weight": 0.8
+        },
+        {
+          "name": "Large Assertion Blocks",
+          "weight": 0.7
+        },
+        {
+          "name": "Excess Number of Function Arguments",
+          "weight": 0.5
+        },
+        {
+          "name": "Primitive Obsession",
+          "weight": 0.3
+        }
+      ]
+    },
+    {
+      "matching_content_path": "shared/src/**/*.ts",
+      "matching_content_path_doc": "Shared TypeScript types and utilities - high standards for reusable code",
+      "thresholds": [
+        {
+          "name": "function_cyclomatic_complexity_warning",
+          "value": "8"
+        },
+        {
+          "name": "function_lines_of_code_warning",
+          "value": "40"
+        },
+        {
+          "name": "function_max_arguments",
+          "value": "4"
+        },
+        {
+          "name": "file_lines_of_code_for_warning",
+          "value": "200"
+        }
+      ],
+      "rules": [
+        {
+          "name": "Brain Method",
+          "weight": 1.2
+        },
+        {
+          "name": "Code Duplication",
+          "weight": 1.3
+        },
+        {
+          "name": "Complex Method",
+          "weight": 1.1
+        },
+        {
+          "name": "Large Method",
+          "weight": 1.1
+        },
+        {
+          "name": "Primitive Obsession",
+          "weight": 0.8
+        },
+        {
+          "name": "Excess Number of Function Arguments",
+          "weight": 1.0
+        }
+      ]
+    },
+    {
+      "matching_content_path": "backend/src/database/migrations/**/*.ts",
+      "matching_content_path_doc": "Database migrations - relaxed rules for schema definition patterns",
+      "rules": [
+        {
+          "name": "Large Method",
+          "weight": 0.3
+        },
+        {
+          "name": "Lines of Code in a Single File",
+          "weight": 0.4
+        },
+        {
+          "name": "Complex Method",
+          "weight": 0.5
+        },
+        {
+          "name": "Code Duplication",
+          "weight": 0.6
+        }
+      ]
+    }
+  ]
+}
