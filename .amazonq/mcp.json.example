@@ -1,0 +1,80 @@
+{
+    "mcpServers": {
+      "github": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-github"
+        ],
+        "env": {
+          "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+        }
+      },
+      "sequential-thinking": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-sequential-thinking"
+        ],
+        "env": {}
+      },
+      "postgresql-research": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-postgres",
+          "postgresql://username:password@localhost:5432/database?schema=public"
+        ],
+        "env": {}
+      },
+      "postgresql-prd-creator": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-postgres",
+          "postgresql://username:password@localhost:5432/database?schema=public"
+        ],
+        "env": {}
+      },
+      "context7-mcp": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@smithery/cli@latest",
+          "run",
+          "@upstash/context7-mcp",
+          "--key",
+          "your-key-here",
+          "--profile",
+          "your-profile-here"
+        ]
+      },
+      "mcp-playwright": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@executeautomation/playwright-mcp-server"
+        ],
+        "env": {}
+      },
+      "memory": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-memory"
+        ],
+        "env": {}
+      },
+      "supabase": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@supabase/mcp-server-supabase"
+        ],
+        "env": {
+          "SUPABASE_ACCESS_TOKEN": "${SUPABASE_ACCESS_TOKEN}"
+        }
+      }
+    },
+    "isUsingBuiltInNodeForMcp": true
+}

@@ -185,3 +185,7 @@ coverage/
 .pnpm-debug.log*
 .DS_Store
 *.log
+
+# Amazon Q and MCP config files (may contain secrets)
+.amazonq/mcp.json
+.github/mcp.json
