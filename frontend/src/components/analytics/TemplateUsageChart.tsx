@@ -1,5 +1,5 @@
 import React from 'react';
-import { TemplateUsageStats } from '../../types/analytics';
+import { TemplateUsageStats } from 'prd-creator-shared';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 
 interface TemplateUsageChartProps {

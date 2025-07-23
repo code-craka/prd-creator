@@ -12,7 +12,7 @@ import {
   Activity
 } from 'lucide-react';
 import { analyticsService } from '../../services/analyticsService';
-import { AnalyticsDashboardData, TimeRange } from '../../types/analytics';
+import { AnalyticsDashboardData, TimeRange } from 'prd-creator-shared';
 import MetricCard from './MetricCard';
 import TrendsChart from './TrendsChart';
 import TemplateUsageChart from './TemplateUsageChart';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { PRDTrends, TimeRange } from '../../types/analytics';
+import { PRDTrends, TimeRange } from 'prd-creator-shared';
 
 interface TrendsChartProps {
   data: PRDTrends;

@@ -96,3 +96,6 @@ export * from './onboarding';
 
 // Export team and member types
 export * from './team';
+
+// Export analytics types
+export * from './analytics';

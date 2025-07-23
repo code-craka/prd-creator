@@ -1,3 +1,19 @@
+// Analytics and metrics related types and interfaces
+
+// Basic analytics event structure
+export interface AnalyticsEvent {
+  userId?: string;
+  teamId?: string;
+  prdId?: string;
+  eventType: string;
+  eventCategory: string;
+  eventData?: Record<string, unknown>;
+  sessionId?: string;
+  ipAddress?: string;
+  userAgent?: string;
+}
+
+// Team productivity metrics
 export interface TeamProductivityMetrics {
   teamId: string;
   teamName: string;
@@ -16,6 +32,7 @@ export interface TeamProductivityMetrics {
   }>;
 }
 
+// PRD trends and usage patterns
 export interface PRDTrends {
   daily: Array<{
     date: string;
@@ -37,6 +54,7 @@ export interface PRDTrends {
   }>;
 }
 
+// Template usage statistics
 export interface TemplateUsageStats {
   templateName: string;
   templateType: string;
@@ -50,6 +68,7 @@ export interface TemplateUsageStats {
   }>;
 }
 
+// User engagement metrics
 export interface UserEngagementInsights {
   totalUsers: number;
   activeUsers: number;
@@ -65,10 +84,11 @@ export interface UserEngagementInsights {
     userName: string;
     timeSpent: number;
     prdsCreated: number;
-    lastActive: Date;
+    lastActive: Date | string;
   }>;
 }
 
+// Dashboard data aggregation
 export interface AnalyticsDashboardData {
   teamProductivity: TeamProductivityMetrics;
   prdTrends: PRDTrends;
@@ -77,19 +97,12 @@ export interface AnalyticsDashboardData {
   generatedAt: string;
 }
 
-export interface AnalyticsEvent {
-  eventType: string;
-  eventCategory: string;
-  eventData?: EventData;
-  prdId?: string;
-  sessionId?: string;
-}
-
-// Specific event data interfaces
+// Event data base interface
 export interface EventData {
   [key: string]: string | number | boolean | string[] | null | undefined;
 }
 
+// Specific event data interfaces
 export interface PRDEventData extends EventData {
   title?: string;
   content_length?: number;
@@ -132,4 +145,25 @@ export interface CommentEventData extends EventData {
   is_reply?: boolean;
 }
 
+// Time range options for analytics queries
 export type TimeRange = '7d' | '30d' | '90d';
+
+// Additional analytics interfaces for future extensibility
+export interface MetricsSummary {
+  period: TimeRange;
+  totalEvents: number;
+  uniqueUsers: number;
+  avgSessionDuration: number;
+  generatedAt: Date | string;
+}
+
+export interface AnalyticsFilter {
+  teamId?: string;
+  userId?: string;
+  eventType?: string;
+  eventCategory?: string;
+  dateFrom?: Date | string;
+  dateTo?: Date | string;
+  limit?: number;
+  offset?: number;
+}

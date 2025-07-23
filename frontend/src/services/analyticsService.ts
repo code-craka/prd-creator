@@ -1,18 +1,18 @@
 import axios from 'axios';
 import { 
-  AnalyticsDashboardData, 
   TeamProductivityMetrics, 
   PRDTrends, 
   TemplateUsageStats, 
-  UserEngagementInsights,
-  TimeRange,
+  UserEngagementInsights, 
+  AnalyticsDashboardData,
   AnalyticsEvent,
   PRDEventData,
   TemplateEventData,
   AIEventData,
   CollaborationEventData,
-  CommentEventData
-} from '../types/analytics';
+  CommentEventData,
+  TimeRange
+} from 'prd-creator-shared';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
