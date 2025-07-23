@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { memberService } from '../../services/memberService';
-import { TeamMember } from '../../types/team';
+import { TeamMember } from 'prd-creator-shared';
 import { toast } from 'react-hot-toast';
 import MemberCard from './MemberCard';
 import InviteMemberModal from './InviteMemberModal';

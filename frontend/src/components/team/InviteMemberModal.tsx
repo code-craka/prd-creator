@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { X, UserPlus, Mail, Shield, MessageSquare } from 'lucide-react';
 import { memberService } from '../../services/memberService';
-import { TeamInviteRequest } from '../../types/team';
+import { TeamInviteRequest } from 'prd-creator-shared';
 import { toast } from 'react-hot-toast';
 
 interface InviteMemberModalProps {

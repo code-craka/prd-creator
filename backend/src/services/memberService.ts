@@ -5,45 +5,11 @@ import {
   ValidationHelpers
 } from '../utils/errorHelpers';
 import crypto from 'crypto';
-
-export interface TeamInvitation {
-  id: string;
-  team_id: string;
-  email: string;
-  role: 'owner' | 'admin' | 'member';
-  invited_by: string;
-  status: 'pending' | 'accepted' | 'declined' | 'cancelled' | 'expired';
-  token: string;
-  expires_at: string;
-  accepted_at?: string;
-  declined_at?: string;
-  cancelled_at?: string;
-  message?: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface MemberActivityLog {
-  id: string;
-  team_id: string;
-  user_id: string;
-  action: string;
-  metadata?: any;
-  target_resource_id?: string;
-  target_resource_type?: string;
-  created_at: string;
-}
-
-export interface RoleChangeHistory {
-  id: string;
-  team_id: string;
-  user_id: string;
-  old_role?: 'owner' | 'admin' | 'member';
-  new_role: 'owner' | 'admin' | 'member';
-  changed_by: string;
-  reason?: string;
-  changed_at: string;
-}
+import {
+  TeamInvitation,
+  MemberActivityLog,
+  RoleChangeHistory
+} from 'prd-creator-shared';
 
 export class MemberService {
   // Permission checking

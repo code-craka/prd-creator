@@ -7,7 +7,7 @@ import {
   TeamInviteRequest,
   UpdateMemberRoleRequest,
   RemoveMemberRequest
-} from '../types/team';
+} from 'prd-creator-shared';
 
 export const memberService = {
   // Invitation Management

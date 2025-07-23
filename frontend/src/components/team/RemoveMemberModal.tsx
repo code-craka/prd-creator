@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, UserX, AlertTriangle } from 'lucide-react';
-import { TeamMember } from '../../types/team';
+import { TeamMember } from 'prd-creator-shared';
 
 interface RemoveMemberModalProps {
   member: TeamMember;

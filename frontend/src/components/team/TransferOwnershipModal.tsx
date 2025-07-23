@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { teamService } from '../../services/teamService';
 import { memberService } from '../../services/memberService';
-import { TransferOwnershipRequest } from '../../types/team';
+import { TransferOwnershipRequest } from 'prd-creator-shared';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 

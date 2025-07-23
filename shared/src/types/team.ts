@@ -1,3 +1,4 @@
+// Team and Member related types and interfaces
 export interface Team {
   id: string;
   name: string;
@@ -5,8 +6,8 @@ export interface Team {
   owner_id: string;
   description?: string;
   avatar_url?: string;
-  created_at: string;
-  updated_at: string;
+  created_at: Date | string;
+  updated_at: Date | string;
   role?: string; // User's role in this team
 }
 
@@ -16,16 +17,17 @@ export interface TeamMember {
   user_id: string;
   role: 'owner' | 'admin' | 'member';
   invited_by?: string;
-  joined_at?: string;
-  last_active_at?: string;
+  joined_at?: Date | string;
+  last_active_at?: Date | string;
   total_prds_created: number;
   total_prds_edited: number;
   total_comments: number;
   is_active: boolean;
-  deactivated_at?: string;
+  deactivated_at?: Date | string;
   deactivated_by?: string;
-  created_at: string;
-  updated_at: string;
+  created_at: Date | string;
+  updated_at: Date | string;
+  // User fields (when joined with user data)
   name?: string;
   email?: string;
   avatar_url?: string;
@@ -39,13 +41,14 @@ export interface TeamInvitation {
   invited_by: string;
   status: 'pending' | 'accepted' | 'declined' | 'cancelled' | 'expired';
   token: string;
-  expires_at: string;
-  accepted_at?: string;
-  declined_at?: string;
-  cancelled_at?: string;
+  expires_at: Date | string;
+  accepted_at?: Date | string;
+  declined_at?: Date | string;
+  cancelled_at?: Date | string;
   message?: string;
-  created_at: string;
-  updated_at: string;
+  created_at: Date | string;
+  updated_at: Date | string;
+  // Extended fields (when joined with user data)
   invited_by_name?: string;
   invited_by_email?: string;
 }
@@ -55,10 +58,11 @@ export interface MemberActivityLog {
   team_id: string;
   user_id: string;
   action: string;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
   target_resource_id?: string;
   target_resource_type?: string;
-  created_at: string;
+  created_at: Date | string;
+  // Extended fields (when joined with user data)
   user_name?: string;
   user_email?: string;
 }
@@ -71,11 +75,13 @@ export interface RoleChangeHistory {
   new_role: 'owner' | 'admin' | 'member';
   changed_by: string;
   reason?: string;
-  changed_at: string;
+  changed_at: Date | string;
+  // Extended fields (when joined with user data)
   changed_by_name?: string;
   user_name?: string;
 }
 
+// Request/Response types
 export interface CreateTeamRequest {
   name: string;
 }
@@ -122,5 +128,28 @@ export interface TransferOwnershipRequest {
 
 export interface DeleteTeamRequest {
   confirmName: string;
+  reason?: string;
+}
+
+// Member service specific types
+export interface MemberPermissionContext {
+  teamId: string;
+  userId: string;
+  action: 'invite' | 'remove' | 'change_role' | 'manage_invitations';
+}
+
+export interface InvitationContext {
+  email: string;
+  role: 'admin' | 'member';
+  teamId: string;
+  invitedBy: string;
+  message?: string;
+}
+
+export interface MemberRoleUpdateContext {
+  teamId: string;
+  userId: string;
+  targetUserId: string;
+  newRole: 'admin' | 'member';
   reason?: string;
 }

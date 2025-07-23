@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { teamService } from '../../services/teamService';
 import { useAuthStore } from '../../stores/authStore';
-import { Team, UpdateTeamRequest } from '../../types/team';
+import { Team, UpdateTeamRequest } from 'prd-creator-shared';
 import { toast } from 'react-hot-toast';
 import TransferOwnershipModal from './TransferOwnershipModal';
 import DeleteTeamModal from './DeleteTeamModal';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Shield, AlertTriangle } from 'lucide-react';
-import { TeamMember } from '../../types/team';
+import { TeamMember } from 'prd-creator-shared';
 
 interface RoleChangeModalProps {
   member: TeamMember;

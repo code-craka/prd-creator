@@ -11,7 +11,7 @@ import {
   TrendingUp,
   Mail
 } from 'lucide-react';
-import { TeamMember } from '../../types/team';
+import { TeamMember } from 'prd-creator-shared';
 import { memberService } from '../../services/memberService';
 
 interface MemberCardProps {

@@ -10,7 +10,7 @@ import {
   Settings,
   Clock
 } from 'lucide-react';
-import { MemberActivityLog } from '../../types/team';
+import { MemberActivityLog } from 'prd-creator-shared';
 
 interface ActivityFeedProps {
   activities: MemberActivityLog[];
@@ -65,7 +65,8 @@ export default function ActivityFeed({ activities, isLoading }: ActivityFeedProp
   };
 
   const formatActivityMessage = (activity: MemberActivityLog) => {
-    const metadata = activity.metadata ? JSON.parse(activity.metadata) : {};
+    const metadata = activity.metadata ? 
+      (typeof activity.metadata === 'string' ? JSON.parse(activity.metadata) : activity.metadata) : {};
     const userName = activity.user_name || activity.user_email || 'Unknown user';
 
     switch (activity.action) {
@@ -166,7 +167,7 @@ export default function ActivityFeed({ activities, isLoading }: ActivityFeedProp
               </p>
               <div className="flex items-center space-x-2 mt-1">
                 <span className="text-xs text-white/50">
-                  {formatDate(activity.created_at)}
+                  {formatDate(typeof activity.created_at === 'string' ? activity.created_at : activity.created_at.toISOString())}
                 </span>
                 {activity.target_resource_type && (
                   <>

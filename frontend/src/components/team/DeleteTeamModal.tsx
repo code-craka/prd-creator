@@ -9,7 +9,7 @@ import {
   Database
 } from 'lucide-react';
 import { teamService } from '../../services/teamService';
-import { Team, DeleteTeamRequest } from '../../types/team';
+import { Team, DeleteTeamRequest } from 'prd-creator-shared';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 

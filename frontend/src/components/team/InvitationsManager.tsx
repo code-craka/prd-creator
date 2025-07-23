@@ -10,7 +10,7 @@ import {
   RotateCcw,
   Trash2
 } from 'lucide-react';
-import { TeamInvitation } from '../../types/team';
+import { TeamInvitation } from 'prd-creator-shared';
 import { memberService } from '../../services/memberService';
 import { toast } from 'react-hot-toast';
 
@@ -154,13 +154,13 @@ export default function InvitationsManager({
                   </span>
                   <span>•</span>
                   <span>
-                    {formatDate(invitation.created_at)}
+                    {formatDate(typeof invitation.created_at === 'string' ? invitation.created_at : invitation.created_at.toISOString())}
                   </span>
                   {invitation.status === 'pending' && (
                     <>
                       <span>•</span>
-                      <span className={isExpired(invitation.expires_at) ? 'text-red-400' : ''}>
-                        Expires {formatDate(invitation.expires_at)}
+                      <span className={isExpired(typeof invitation.expires_at === 'string' ? invitation.expires_at : invitation.expires_at.toISOString()) ? 'text-red-400' : ''}>
+                        Expires {formatDate(typeof invitation.expires_at === 'string' ? invitation.expires_at : invitation.expires_at.toISOString())}
                       </span>
                     </>
                   )}

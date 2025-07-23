@@ -8,31 +8,6 @@ export interface User {
   updated_at: Date;
 }
 
-export interface Team {
-  id: string;
-  name: string;
-  slug: string;
-  owner_id: string;
-  description?: string;
-  avatar_url?: string;
-  created_at: Date;
-  updated_at: Date;
-}
-
-export interface TeamMember {
-  id: string;
-  team_id: string;
-  user_id: string;
-  role: 'owner' | 'admin' | 'member';
-  invited_by?: string;
-  joined_at?: Date;
-  created_at: Date;
-  // User fields (when joined)
-  name?: string;
-  email?: string;
-  avatar_url?: string;
-}
-
 export interface PRD {
   id: string;
   user_id: string;
@@ -73,10 +48,6 @@ export interface Template {
   usage_count: number;
   created_by: string;
   created_at: Date;
-}
-
-export interface CreateTeamRequest {
-  name: string;
 }
 
 export interface CreatePRDRequest {
@@ -122,3 +93,6 @@ export interface PaginatedResponse<T = any> {
 
 // Export onboarding types
 export * from './onboarding';
+
+// Export team and member types
+export * from './team';
