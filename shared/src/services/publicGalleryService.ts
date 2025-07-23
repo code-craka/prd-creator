@@ -401,3 +401,135 @@ function extractStatsData(data: any): PublicPRDStats {
     clones: data.clone_count || 0
   };
 }
+
+// ============================================================================
+// API HELPER FUNCTIONS
+// ============================================================================
+
+/**
+ * Build URL search parameters from gallery filters
+ * Used by frontend for API calls
+ */
+export function buildGalleryQueryParams(filters: PublicGalleryFilters): URLSearchParams {
+  const params = new URLSearchParams();
+  
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      if (Array.isArray(value)) {
+        value.forEach(v => params.append(key, v.toString()));
+      } else {
+        params.append(key, value.toString());
+      }
+    }
+  });
+
+  return params;
+}
+
+/**
+ * Apply gallery filters to a database query (for backend use)
+ * Common filtering logic that can be shared
+ */
+export function applyGalleryFilters(filters: PublicGalleryFilters) {
+  return {
+    category: filters.category,
+    industry: filters.industry,
+    complexity_level: filters.complexity_level,
+    tags: filters.tags,
+    search: filters.search,
+    sort_by: filters.sort_by || 'newest',
+    page: Math.max(1, filters.page || 1),
+    limit: Math.min(50, Math.max(1, filters.limit || 12))
+  };
+}
+
+/**
+ * Build sort order SQL for different sort options
+ * Used by backend for database queries
+ */
+export function buildSortOrder(sortBy: SortOption): string {
+  switch (sortBy) {
+    case 'popular':
+      return '(view_count + like_count * 2 + share_count * 3) DESC';
+    case 'trending':
+      return `
+        CASE 
+          WHEN is_trending THEN 1 
+          ELSE 0 
+        END DESC,
+        (view_count + like_count * 2) / GREATEST(EXTRACT(EPOCH FROM (NOW() - created_at)), 1) DESC
+      `;
+    case 'most_liked':
+      return 'like_count DESC';
+    case 'newest':
+    default:
+      return 'created_at DESC';
+  }
+}
+
+/**
+ * Calculate pagination metadata
+ */
+export function calculatePagination(page: number, limit: number, total: number) {
+  const totalPages = Math.ceil(total / limit);
+  return {
+    page,
+    limit,
+    total,
+    pages: totalPages,
+    hasNext: page < totalPages,
+    hasPrev: page > 1,
+    offset: (page - 1) * limit
+  };
+}
+
+/**
+ * Validate publish PRD data
+ */
+export function validatePublishPRDData(data: any): { isValid: boolean; errors: string[] } {
+  const errors: string[] = [];
+
+  if (!data.title || typeof data.title !== 'string' || data.title.trim().length === 0) {
+    errors.push('Title is required');
+  }
+
+  if (!data.industry || typeof data.industry !== 'string') {
+    errors.push('Industry is required');
+  }
+
+  if (!isValidComplexityLevel(data.complexity_level)) {
+    errors.push('Valid complexity level is required');
+  }
+
+  if (data.tags && !Array.isArray(data.tags)) {
+    errors.push('Tags must be an array');
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+}
+
+/**
+ * Format stats for display
+ */
+export function formatStats(stats: PublicPRDStats): {
+  views: string;
+  likes: string;
+  shares: string;
+  clones: string;
+} {
+  return {
+    views: formatCount(stats.views),
+    likes: formatCount(stats.likes),
+    shares: formatCount(stats.shares),
+    clones: formatCount(stats.clones)
+  };
+}
+
+function formatCount(count: number): string {
+  if (count < 1000) return count.toString();
+  if (count < 1000000) return `${(count / 1000).toFixed(1)}K`;
+  return `${(count / 1000000).toFixed(1)}M`;
+}

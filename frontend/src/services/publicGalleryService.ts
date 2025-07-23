@@ -6,22 +6,13 @@ import {
   PublicGalleryResponse,
   GalleryStats,
   SocialShareData,
-  PublishPRDData
+  PublishPRDData,
+  buildGalleryQueryParams
 } from 'prd-creator-shared';
 
 class PublicGalleryService {
   async getPublicPRDs(filters: PublicGalleryFilters = {}): Promise<PublicGalleryResponse> {
-    const params = new URLSearchParams();
-    
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        if (Array.isArray(value)) {
-          value.forEach(v => params.append(key, v));
-        } else {
-          params.append(key, value.toString());
-        }
-      }
-    });
+    const params = buildGalleryQueryParams(filters);
 
     return apiCall(() => 
       api.get<{ success: boolean; data: PublicGalleryResponse }>(`/public-gallery/prds?${params}`)

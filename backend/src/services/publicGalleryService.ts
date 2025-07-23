@@ -7,15 +7,14 @@ import {
   PublicGalleryFilters,
   SocialShareData,
   PublishPRDData,
-  GalleryStats,
-  ComplexityLevel,
   GalleryCategory,
   calculateEngagementScore,
   parseTags,
   parseSocialMetrics,
-  transformToPublicPRD,
-  ShareUrlOptions,
-  generateShareUrl
+  applyGalleryFilters,
+  buildSortOrder,
+  calculatePagination,
+  validatePublishPRDData
 } from 'prd-creator-shared';
 
 // Backend-specific interfaces that extend shared ones
@@ -59,6 +58,12 @@ class PublicGalleryService {
     prdId: string,
     publicData: PublishPRDData
   ): Promise<BackendPublicPRD> {
+    // Validate data using shared utility
+    const validation = validatePublishPRDData(publicData);
+    if (!validation.isValid) {
+      throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
+    }
+
     // Check if PRD is already published
     const existing = await db('public_prds')
       .where('prd_id', prdId)
@@ -99,16 +104,17 @@ class PublicGalleryService {
     page: number;
     totalPages: number;
   }> {
+    const sanitizedFilters = applyGalleryFilters(filters);
     const {
       category,
       industry,
       complexity_level,
       tags,
       search,
-      sort_by = 'newest',
-      page = 1,
-      limit = 12
-    } = filters;
+      sort_by,
+      page,
+      limit
+    } = sanitizedFilters;
 
     let query = db('public_prds as pp')
       .leftJoin('users as u', 'pp.user_id', 'u.id')
@@ -148,37 +154,17 @@ class PublicGalleryService {
       });
     }
 
-    // Apply sorting
-    switch (sort_by) {
-      case 'popular':
-        query = query.orderByRaw('(pp.view_count + pp.like_count * 2 + pp.share_count * 3) DESC');
-        break;
-      case 'trending':
-        query = query.orderByRaw(`
-          CASE 
-            WHEN pp.is_trending THEN 1 
-            ELSE 0 
-          END DESC,
-          (pp.view_count + pp.like_count * 2) / EXTRACT(EPOCH FROM (NOW() - pp.created_at)) DESC
-        `);
-        break;
-      case 'most_liked':
-        query = query.orderBy('pp.like_count', 'desc');
-        break;
-      case 'newest':
-      default:
-        query = query.orderBy('pp.created_at', 'desc');
-        break;
-    }
+    // Apply sorting using shared utility
+    query = query.orderByRaw(buildSortOrder(sort_by));
 
     // Get total count
     const totalQuery = query.clone().clearSelect().clearOrder().count('* as total');
     const totalResult = await totalQuery.first();
     const total = parseInt(totalResult?.total as string) || 0;
 
-    // Apply pagination
-    const offset = (page - 1) * limit;
-    const results = await query.limit(limit).offset(offset);
+    // Apply pagination using shared utility
+    const pagination = calculatePagination(page, limit, total);
+    const results = await query.limit(limit).offset(pagination.offset);
 
     const prds = results.map((row) => ({
       ...row,
@@ -201,7 +187,7 @@ class PublicGalleryService {
       prds,
       total,
       page,
-      totalPages: Math.ceil(total / limit)
+      totalPages: pagination.pages
     };
   }
 
