@@ -1,17 +1,28 @@
 import { db } from '../config/database';
 import { generateSlug } from '../utils/slugGenerator';
 import { ViralTrackingService } from './viralTrackingService';
+import {
+  PublicPRD,
+  PublicPRDWithDetails,
+  PublicGalleryFilters,
+  SocialShareData,
+  PublishPRDData,
+  GalleryStats,
+  ComplexityLevel,
+  GalleryCategory,
+  calculateEngagementScore,
+  parseTags,
+  parseSocialMetrics,
+  transformToPublicPRD,
+  ShareUrlOptions,
+  generateShareUrl
+} from 'prd-creator-shared';
 
-export interface PublicPRD {
-  id: string;
+// Backend-specific interfaces that extend shared ones
+export interface BackendPublicPRD extends Omit<PublicPRD, 'stats' | 'author'> {
   prd_id: string;
   user_id: string;
-  title: string;
-  description: string | null;
-  category: 'featured' | 'trending' | 'community';
-  tags: string[];
-  industry: string;
-  complexity_level: 'beginner' | 'intermediate' | 'advanced';
+  category: GalleryCategory;
   view_count: number;
   like_count: number;
   share_count: number;
@@ -27,7 +38,7 @@ export interface PublicPRD {
   updated_at: Date;
 }
 
-export interface PublicPRDWithDetails extends PublicPRD {
+export interface BackendPublicPRDWithDetails extends BackendPublicPRD {
   author: {
     id: string;
     name: string;
@@ -41,37 +52,13 @@ export interface PublicPRDWithDetails extends PublicPRD {
   engagement_score: number;
 }
 
-export interface GalleryFilters {
-  category?: 'featured' | 'trending' | 'community';
-  industry?: string;
-  complexity_level?: 'beginner' | 'intermediate' | 'advanced';
-  tags?: string[];
-  search?: string;
-  sort_by?: 'newest' | 'popular' | 'trending' | 'most_liked';
-  page?: number;
-  limit?: number;
-}
-
-export interface SocialShareData {
-  platform: 'twitter' | 'linkedin' | 'email' | 'slack' | 'copy_link';
-  share_text?: string;
-  hashtags?: string[];
-}
-
 class PublicGalleryService {
   // Publish PRD to public gallery
   async publishPRD(
     userId: string,
     prdId: string,
-    publicData: {
-      title: string;
-      description?: string;
-      industry: string;
-      complexity_level: 'beginner' | 'intermediate' | 'advanced';
-      tags?: string[];
-      seo_description?: string;
-    }
-  ): Promise<PublicPRD> {
+    publicData: PublishPRDData
+  ): Promise<BackendPublicPRD> {
     // Check if PRD is already published
     const existing = await db('public_prds')
       .where('prd_id', prdId)
@@ -106,8 +93,8 @@ class PublicGalleryService {
   }
 
   // Get public PRDs with filters
-  async getPublicPRDs(filters: GalleryFilters = {}): Promise<{
-    prds: PublicPRDWithDetails[];
+  async getPublicPRDs(filters: PublicGalleryFilters = {}): Promise<{
+    prds: BackendPublicPRDWithDetails[];
     total: number;
     page: number;
     totalPages: number;
@@ -195,8 +182,8 @@ class PublicGalleryService {
 
     const prds = results.map((row) => ({
       ...row,
-      tags: JSON.parse(row.tags || '[]'),
-      social_metrics: JSON.parse(row.social_metrics || '{}'),
+      tags: parseTags(row.tags),
+      social_metrics: parseSocialMetrics(row.social_metrics),
       author: {
         id: row.user_id,
         name: row.author_name,
@@ -205,9 +192,9 @@ class PublicGalleryService {
       },
       prd: {
         content: row.prd_content,
-        sections: JSON.parse(row.prd_sections || '[]')
+        sections: parseTags(row.prd_sections)
       },
-      engagement_score: this.calculateEngagementScore(row)
+      engagement_score: calculateEngagementScore(row)
     }));
 
     return {
@@ -248,8 +235,8 @@ class PublicGalleryService {
 
     return {
       ...prd,
-      tags: JSON.parse(prd.tags || '[]'),
-      social_metrics: JSON.parse(prd.social_metrics || '{}'),
+      tags: parseTags(prd.tags),
+      social_metrics: parseSocialMetrics(prd.social_metrics),
       author: {
         id: prd.user_id,
         name: prd.author_name,
@@ -258,9 +245,9 @@ class PublicGalleryService {
       },
       prd: {
         content: prd.prd_content,
-        sections: JSON.parse(prd.prd_sections || '[]')
+        sections: parseTags(prd.prd_sections)
       },
-      engagement_score: this.calculateEngagementScore(prd)
+      engagement_score: calculateEngagementScore(prd)
     };
   }
 
@@ -328,7 +315,7 @@ class PublicGalleryService {
       .increment('share_count', 1);
 
     // Update social metrics
-    const socialMetrics = JSON.parse(publicPrd.social_metrics || '{}');
+    const socialMetrics = parseSocialMetrics(publicPrd.social_metrics);
     socialMetrics[shareData.platform] = (socialMetrics[shareData.platform] || 0) + 1;
 
     await db('public_prds')
@@ -401,7 +388,7 @@ class PublicGalleryService {
     prdId: string,
     reason: string,
     featuredUntil?: Date
-  ): Promise<PublicPRD> {
+  ): Promise<BackendPublicPRD> {
     const updated = await db('public_prds')
       .where('prd_id', prdId)
       .update({
@@ -521,16 +508,6 @@ class PublicGalleryService {
     await db('public_prds')
       .where('id', publicPrdId)
       .increment('view_count', 1);
-  }
-
-  private calculateEngagementScore(prd: any): number {
-    const views = prd.view_count || 0;
-    const likes = prd.like_count || 0;
-    const shares = prd.share_count || 0;
-    const clones = prd.clone_count || 0;
-
-    // Weighted engagement score
-    return views + (likes * 2) + (shares * 3) + (clones * 5);
   }
 }
 
