@@ -1,6 +1,6 @@
 import { teamService } from '../../services/teamService';
-import { TestDataFactory } from '../utils/testHelpers';
-import { ValidationError, NotFoundError, ForbiddenError, ConflictError } from '../../middleware/errorHandler';
+import { TestDataFactory, generateNonExistentUUID } from '../utils/testHelpers';
+import { ValidationError, NotFoundError, ForbiddenError, ConflictError } from '../../utils/errorHelpers';
 
 describe('TeamService', () => {
   describe('createTeam', () => {
@@ -129,9 +129,10 @@ describe('TeamService', () => {
     it('should throw NotFoundError for non-existent member', async () => {
       const owner = await TestDataFactory.createUser();
       const team = await TestDataFactory.createTeam(owner.id);
+      const nonExistentId = generateNonExistentUUID();
 
       await expect(
-        teamService.updateMemberRole(team.id, owner.id, 'non-existent-id', 'admin')
+        teamService.updateMemberRole(team.id, owner.id, nonExistentId, 'admin')
       ).rejects.toThrow(NotFoundError);
     });
   });

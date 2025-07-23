@@ -77,6 +77,14 @@ export class AuthService {
   }
 
   static async getCurrentUser(userId: string): Promise<User> {
+    // Validate UUID format first
+    try {
+      ValidationHelpers.validateUUID(userId, 'User ID');
+    } catch (error) {
+      // Convert UUID validation errors to user not found for security
+      throw ErrorFactory.userNotFound();
+    }
+    
     const user = await userDb.findById(userId);
     if (!user) {
       throw ErrorFactory.userNotFound();

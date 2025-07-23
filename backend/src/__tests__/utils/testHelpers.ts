@@ -2,6 +2,16 @@ import { db } from '../../config/database';
 import { hashPassword, generateToken } from '../../utils/helpers';
 import { User, Team, PRD } from 'prd-creator-shared';
 
+// Generate a valid UUID for testing
+export const generateTestUUID = (): string => {
+  return '12345678-1234-4567-8901-' + Date.now().toString().padStart(12, '0').slice(-12);
+};
+
+// Generate a non-existent but valid UUID for testing
+export const generateNonExistentUUID = (): string => {
+  return '00000000-0000-4000-8000-000000000000';
+};
+
 export class TestDataFactory {
   static async createUser(overrides: Partial<User> = {}): Promise<User> {
     const userData = {

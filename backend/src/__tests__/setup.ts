@@ -15,18 +15,34 @@ afterAll(async () => {
   await db.destroy();
 });
 
-// Clean up database between tests
+// Clean up database between tests using a more efficient approach
 afterEach(async () => {
-  // Truncate all tables except migrations
-  const tables = await db.raw(`
-    SELECT tablename FROM pg_tables 
-    WHERE schemaname = 'public' 
-    AND tablename != 'knex_migrations' 
-    AND tablename != 'knex_migrations_lock'
-  `);
-  
-  for (const table of tables.rows) {
-    await db.raw(`TRUNCATE TABLE "${table.tablename}" RESTART IDENTITY CASCADE`);
+  try {
+    // Disable foreign key checks temporarily and truncate in dependency order
+    await db.raw('SET session_replication_role = replica');
+    
+    // Get all tables except system tables
+    const tables = await db.raw(`
+      SELECT tablename FROM pg_tables 
+      WHERE schemaname = 'public' 
+      AND tablename != 'knex_migrations' 
+      AND tablename != 'knex_migrations_lock'
+      ORDER BY tablename
+    `);
+    
+    // Truncate all tables in a single transaction
+    await db.transaction(async (trx) => {
+      for (const table of tables.rows) {
+        await trx.raw(`TRUNCATE TABLE "${table.tablename}" RESTART IDENTITY CASCADE`);
+      }
+    });
+    
+    // Re-enable foreign key checks
+    await db.raw('SET session_replication_role = DEFAULT');
+  } catch (error) {
+    console.error('Database cleanup failed:', error);
+    // Try alternative cleanup approach
+    await db.raw('TRUNCATE TABLE team_members, team_invitations, prds, teams, users RESTART IDENTITY CASCADE');
   }
 });
 

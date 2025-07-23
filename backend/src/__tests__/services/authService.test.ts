@@ -1,6 +1,6 @@
 import { AuthService } from '../../services/authService';
-import { TestDataFactory } from '../utils/testHelpers';
-import { ValidationError, UnauthorizedError, ConflictError } from '../../middleware/errorHandler';
+import { TestDataFactory, generateNonExistentUUID } from '../utils/testHelpers';
+import { NotFoundError, ValidationError, UnauthorizedError, ConflictError } from '../../utils/errorHelpers';
 
 describe('AuthService', () => {
   describe('register', () => {
@@ -98,8 +98,9 @@ describe('AuthService', () => {
     });
 
     it('should throw NotFoundError for invalid user ID', async () => {
+      const nonExistentId = generateNonExistentUUID();
       await expect(
-        AuthService.getCurrentUser('non-existent-id')
+        AuthService.getCurrentUser(nonExistentId)
       ).rejects.toThrow('User not found');
     });
   });

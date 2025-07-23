@@ -212,8 +212,39 @@ export class PRDService {
       query = query.where('prds.template_id', filters.templateId);
     }
 
-    // Get total count
-    const totalResult = await query.clone().count('* as count').first();
+    // Get total count - fix GROUP BY issue for team PRDs
+    const totalResult = await db('prds')
+      .where('prds.team_id', teamId)
+      .where('prds.visibility', 'team')
+      .modify((queryBuilder) => {
+        // Apply the same filters for count
+        if (filters.search) {
+          queryBuilder.where(function() {
+            this.where('prds.title', 'ilike', `%${filters.search}%`)
+                .orWhere('prds.content', 'ilike', `%${filters.search}%`);
+          });
+        }
+
+        if (filters.author) {
+          queryBuilder.join('users', 'prds.user_id', 'users.id')
+                     .where('users.name', 'ilike', `%${filters.author}%`);
+        }
+
+        if (filters.dateFrom) {
+          queryBuilder.where('prds.created_at', '>=', filters.dateFrom);
+        }
+
+        if (filters.dateTo) {
+          queryBuilder.where('prds.created_at', '<=', filters.dateTo);
+        }
+
+        if (filters.templateId) {
+          queryBuilder.where('prds.template_id', filters.templateId);
+        }
+      })
+      .count('prds.id as count')
+      .first();
+    
     const total = parseInt(totalResult?.count as string) || 0;
 
     // Apply pagination
