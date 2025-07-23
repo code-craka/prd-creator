@@ -1,19 +1,28 @@
 import { db } from '../config/database';
-import { generateSlug, isValidEmail } from '../utils/helpers';
 import { 
-  ErrorFactory,
-  ValidationHelpers
+  ErrorFactory
 } from '../utils/errorHelpers';
 import crypto from 'crypto';
 import {
   TeamInvitation,
   MemberActivityLog,
-  RoleChangeHistory
+  RoleChangeHistory,
+  // Import shared utilities
+  hasPermission,
+  isValidEmail,
+  normalizeEmail,
+  isValidRoleChange,
+  calculateInvitationExpiry,
+  createPermissionErrorMessage,
+  createValidationErrorMessage,
+  TeamRole,
+  MemberAction,
+  DEFAULT_INVITATION_EXPIRY_DAYS
 } from 'prd-creator-shared';
 
 export class MemberService {
   // Permission checking
-  async verifyPermission(teamId: string, userId: string, action: 'invite' | 'remove' | 'change_role' | 'manage_invitations'): Promise<boolean> {
+  async verifyPermission(teamId: string, userId: string, action: MemberAction): Promise<boolean> {
     const member = await db('team_members')
       .where({ team_id: teamId, user_id: userId })
       .first();
@@ -22,18 +31,7 @@ export class MemberService {
       return false;
     }
 
-    switch (action) {
-      case 'invite':
-        return ['owner', 'admin'].includes(member.role);
-      case 'remove':
-        return ['owner', 'admin'].includes(member.role);
-      case 'change_role':
-        return member.role === 'owner'; // Only owners can change roles
-      case 'manage_invitations':
-        return ['owner', 'admin'].includes(member.role);
-      default:
-        return false;
-    }
+    return hasPermission(member.role as TeamRole, action);
   }
 
   // Enhanced invitation system
@@ -41,22 +39,22 @@ export class MemberService {
     teamId: string, 
     inviterId: string, 
     email: string, 
-    role: 'admin' | 'member' = 'member',
+    role: TeamRole = 'member',
     message?: string
   ): Promise<TeamInvitation> {
     // Verify permissions
     if (!await this.verifyPermission(teamId, inviterId, 'invite')) {
-      throw ErrorFactory.forbidden('You do not have permission to invite members');
+      throw ErrorFactory.forbidden(createPermissionErrorMessage('invite'));
     }
 
     if (!isValidEmail(email)) {
-      throw ErrorFactory.validation('Invalid email address');
+      throw ErrorFactory.validation(createValidationErrorMessage('email', email));
     }
 
-    const normalizedEmail = email.toLowerCase();
+    const normalizedEmailAddr = normalizeEmail(email);
 
     // Check if already a member
-    const existingUser = await db('users').where('email', normalizedEmail).first();
+    const existingUser = await db('users').where('email', normalizedEmailAddr).first();
     if (existingUser) {
       const existingMember = await db('team_members')
         .where({ team_id: teamId, user_id: existingUser.id })
@@ -71,7 +69,7 @@ export class MemberService {
     const existingInvitation = await db('team_invitations')
       .where({ 
         team_id: teamId, 
-        email: normalizedEmail, 
+        email: normalizedEmailAddr, 
         status: 'pending' 
       })
       .first();
@@ -82,12 +80,11 @@ export class MemberService {
 
     // Generate secure token
     const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiry
+    const expiresAt = calculateInvitationExpiry(DEFAULT_INVITATION_EXPIRY_DAYS);
 
     const [invitation] = await db('team_invitations').insert({
       team_id: teamId,
-      email: normalizedEmail,
+      email: normalizedEmailAddr,
       role,
       invited_by: inviterId,
       token,
@@ -98,7 +95,7 @@ export class MemberService {
 
     // Log activity
     await this.logActivity(teamId, inviterId, 'invitation_sent', {
-      email: normalizedEmail,
+      email: normalizedEmailAddr,
       role,
       message
     });
@@ -124,7 +121,7 @@ export class MemberService {
 
   async resendInvitation(teamId: string, userId: string, invitationId: string): Promise<void> {
     if (!await this.verifyPermission(teamId, userId, 'manage_invitations')) {
-      throw ErrorFactory.forbidden('You do not have permission to resend invitations');
+      throw ErrorFactory.forbidden(createPermissionErrorMessage('manage_invitations'));
     }
 
     const invitation = await db('team_invitations')
@@ -141,8 +138,7 @@ export class MemberService {
 
     // Update expiry and generate new token
     const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7);
+    const expiresAt = calculateInvitationExpiry(DEFAULT_INVITATION_EXPIRY_DAYS);
 
     await db('team_invitations')
       .where('id', invitationId)
@@ -161,7 +157,7 @@ export class MemberService {
 
   async cancelInvitation(teamId: string, userId: string, invitationId: string): Promise<void> {
     if (!await this.verifyPermission(teamId, userId, 'manage_invitations')) {
-      throw ErrorFactory.forbidden('You do not have permission to cancel invitations');
+      throw ErrorFactory.forbidden(createPermissionErrorMessage('manage_invitations'));
     }
 
     const invitation = await db('team_invitations')
@@ -196,11 +192,11 @@ export class MemberService {
     teamId: string, 
     adminId: string, 
     memberId: string, 
-    newRole: 'admin' | 'member',
+    newRole: TeamRole,
     reason?: string
   ): Promise<void> {
     if (!await this.verifyPermission(teamId, adminId, 'change_role')) {
-      throw ErrorFactory.forbidden('You do not have permission to change member roles');
+      throw ErrorFactory.forbidden(createPermissionErrorMessage('change_role'));
     }
 
     // Get current member
@@ -217,9 +213,9 @@ export class MemberService {
       throw ErrorFactory.forbidden('Cannot change your own role');
     }
 
-    // Can't change owner role
-    if (member.role === 'owner') {
-      throw ErrorFactory.forbidden('Cannot change owner role');
+    // Validate role change using shared logic
+    if (!isValidRoleChange(member.role, newRole, 'owner')) {
+      throw ErrorFactory.forbidden('Invalid role change');
     }
 
     // Set current user context for triggers

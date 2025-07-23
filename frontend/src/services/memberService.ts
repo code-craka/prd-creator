@@ -6,7 +6,14 @@ import {
   RoleChangeHistory,
   TeamInviteRequest,
   UpdateMemberRoleRequest,
-  RemoveMemberRequest
+  RemoveMemberRequest,
+  // Import shared utilities
+  canInviteMembers,
+  canRemoveMembers,
+  canChangeRoles,
+  canRemoveSpecificMember,
+  canChangeSpecificRole,
+  TeamRole
 } from 'prd-creator-shared';
 
 export const memberService = {
@@ -89,26 +96,10 @@ export const memberService = {
     return response.history;
   },
 
-  // Permission Helpers
-  canInviteMembers(userRole: string): boolean {
-    return ['owner', 'admin'].includes(userRole);
-  },
-
-  canRemoveMembers(userRole: string): boolean {
-    return ['owner', 'admin'].includes(userRole);
-  },
-
-  canChangeRoles(userRole: string): boolean {
-    return userRole === 'owner';
-  },
-
-  canRemoveSpecificMember(userRole: string, targetRole: string): boolean {
-    if (userRole === 'owner') return targetRole !== 'owner';
-    if (userRole === 'admin') return targetRole === 'member';
-    return false;
-  },
-
-  canChangeSpecificRole(userRole: string, targetRole: string): boolean {
-    return userRole === 'owner' && targetRole !== 'owner';
-  },
+  // Permission Helpers (re-exported from shared service for convenience)
+  canInviteMembers,
+  canRemoveMembers, 
+  canChangeRoles,
+  canRemoveSpecificMember,
+  canChangeSpecificRole,
 };
