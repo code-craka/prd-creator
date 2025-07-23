@@ -8,6 +8,12 @@
 [![Node.js](https://img.shields.io/badge/Node.js-18.0+-green.svg)](https://nodejs.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14.0+-blue.svg)](https://www.postgresql.org/)
 
+[![CodeScene Average Code Health](https://codescene.io/projects/69377/status-badges/average-code-health)](https://codescene.io/projects/69377)
+[![CodeScene Hotspot Code Health](https://codescene.io/projects/69377/status-badges/hotspot-code-health)](https://codescene.io/projects/69377)
+[![CodeScene Missed Goals](https://codescene.io/projects/69377/status-badges/missed-goals)](https://codescene.io/projects/69377)
+[![CodeScene System Mastery](https://codescene.io/projects/69377/status-badges/system-mastery)](https://codescene.io/projects/69377)
+[![CodeScene general](https://codescene.io/images/analyzed-by-codescene-badge.svg)](https://codescene.io/projects/69377)
+
 ## 📋 Table of Contents
 
 - [Overview](#overview)
