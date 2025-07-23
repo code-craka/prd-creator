@@ -1,25 +1,27 @@
 import { db } from '../config/database';
 import { generateSlug, isValidEmail } from '../utils/helpers';
 import { 
-  ValidationError, 
-  NotFoundError, 
-  ForbiddenError,
-  ConflictError 
-} from '../middleware/errorHandler';
+  ErrorFactory,
+  ValidationHelpers
+} from '../utils/errorHelpers';
+import { teamDb } from '../utils/dbHelpers';
 import { Team, TeamMember, CreateTeamRequest } from 'prd-creator-shared';
 
 export class TeamService {
   async createTeam(ownerId: string, data: CreateTeamRequest): Promise<Team> {
-    if (!data.name || data.name.trim().length < 2) {
-      throw new ValidationError('Team name must be at least 2 characters long');
+    // Validate input using utility helpers
+    ValidationHelpers.validateRequired(data.name?.trim(), 'Team name');
+    
+    const teamName = data.name!.trim();
+    if (teamName.length < 2) {
+      throw ErrorFactory.validation('Team name must be at least 2 characters long');
     }
 
-    const teamName = data.name.trim();
     const slug = await this.generateUniqueSlug(teamName);
 
     // Start transaction
     return db.transaction(async (trx) => {
-      // Create team
+      // Create team using dbHelper
       const [team] = await trx('teams').insert({
         name: teamName,
         slug,
@@ -63,7 +65,7 @@ export class TeamService {
       .first();
 
     if (!team) {
-      throw new NotFoundError('Team not found');
+      throw ErrorFactory.teamNotFound();
     }
 
     return team;
@@ -75,7 +77,7 @@ export class TeamService {
 
     // Validate updates
     if (updates.name && updates.name.trim().length < 2) {
-      throw new ValidationError('Team name must be at least 2 characters long');
+      throw ErrorFactory.validation('Team name must be at least 2 characters long');
     }
 
     const cleanUpdates: any = {};
@@ -91,7 +93,7 @@ export class TeamService {
     }
 
     if (Object.keys(cleanUpdates).length === 0) {
-      throw new ValidationError('No valid updates provided');
+      throw ErrorFactory.validation('No valid updates provided');
     }
 
     const [team] = await db('teams')
@@ -100,7 +102,7 @@ export class TeamService {
       .returning('*');
 
     if (!team) {
-      throw new NotFoundError('Team not found');
+      throw ErrorFactory.notFound('Team not found');
     }
 
     return team;
@@ -111,7 +113,7 @@ export class TeamService {
     await this.verifyTeamPermission(teamId, inviterId, ['owner', 'admin']);
 
     if (!isValidEmail(email)) {
-      throw new ValidationError('Invalid email address');
+      throw ErrorFactory.validation('Invalid email address');
     }
 
     const normalizedEmail = email.toLowerCase();
@@ -124,7 +126,7 @@ export class TeamService {
     if (!invitee) {
       // TODO: Send invitation email to non-user
       // For now, we'll throw an error
-      throw new NotFoundError('User with this email does not exist. Email invitations will be implemented later.');
+      throw ErrorFactory.notFound('User with this email does not exist. Email invitations will be implemented later.');
     }
 
     // Check if already a member
@@ -133,7 +135,7 @@ export class TeamService {
       .first();
 
     if (existingMember) {
-      throw new ConflictError('User is already a team member');
+      throw ErrorFactory.conflict('User is already a team member');
     }
 
     // Add as team member
@@ -174,17 +176,17 @@ export class TeamService {
       .first();
 
     if (!member) {
-      throw new NotFoundError('Team member not found');
+      throw ErrorFactory.notFound('Team member not found');
     }
 
     // Can't change your own role
     if (adminId === memberId) {
-      throw new ForbiddenError('Cannot change your own role');
+      throw ErrorFactory.forbidden('Cannot change your own role');
     }
 
     // Only owners can assign owner role
     if (role === 'owner' && adminMember.role !== 'owner') {
-      throw new ForbiddenError('Only owners can assign owner role');
+      throw ErrorFactory.forbidden('Only owners can assign owner role');
     }
 
     await db.transaction(async (trx) => {
@@ -217,17 +219,17 @@ export class TeamService {
       .first();
 
     if (!member) {
-      throw new NotFoundError('Team member not found');
+      throw ErrorFactory.notFound('Team member not found');
     }
 
     // Can't remove yourself
     if (adminId === memberId) {
-      throw new ForbiddenError('Cannot remove yourself from the team');
+      throw ErrorFactory.forbidden('Cannot remove yourself from the team');
     }
 
     // Can't remove owner
     if (member.role === 'owner') {
-      throw new ForbiddenError('Cannot remove team owner');
+      throw ErrorFactory.forbidden('Cannot remove team owner');
     }
 
     // Only owners can remove admins
@@ -236,7 +238,7 @@ export class TeamService {
       .first();
 
     if (member.role === 'admin' && adminMember?.role !== 'owner') {
-      throw new ForbiddenError('Only owners can remove admins');
+      throw ErrorFactory.forbidden('Only owners can remove admins');
     }
 
     await db.transaction(async (trx) => {
@@ -279,7 +281,7 @@ export class TeamService {
       .first();
 
     if (!team) {
-      throw new NotFoundError('Team not found');
+      throw ErrorFactory.notFound('Team not found');
     }
 
     return team;
@@ -294,7 +296,7 @@ export class TeamService {
       .first();
 
     if (!team) {
-      throw new NotFoundError('Team not found');
+      throw ErrorFactory.notFound('Team not found');
     }
 
     // Get owner information
@@ -327,11 +329,11 @@ export class TeamService {
       .first();
 
     if (!newOwnerMember) {
-      throw new ValidationError('New owner must be a team member');
+      throw ErrorFactory.validation('New owner must be a team member');
     }
 
     if (currentOwnerId === newOwnerId) {
-      throw new ValidationError('Cannot transfer ownership to yourself');
+      throw ErrorFactory.validation('Cannot transfer ownership to yourself');
     }
 
     await db.transaction(async (trx) => {
@@ -376,7 +378,7 @@ export class TeamService {
     const team = await db('teams').where('id', teamId).first();
     
     if (!team) {
-      throw new NotFoundError('Team not found');
+      throw ErrorFactory.notFound('Team not found');
     }
 
     await db.transaction(async (trx) => {
@@ -436,7 +438,7 @@ export class TeamService {
       .first();
 
     if (!member) {
-      throw new ForbiddenError('Not a team member');
+      throw ErrorFactory.forbidden('Not a team member');
     }
 
     return member;
@@ -446,7 +448,7 @@ export class TeamService {
     const member = await this.verifyTeamMembership(teamId, userId);
 
     if (!allowedRoles.includes(member.role)) {
-      throw new ForbiddenError('Insufficient permissions');
+      throw ErrorFactory.forbidden('Insufficient permissions');
     }
 
     return member;

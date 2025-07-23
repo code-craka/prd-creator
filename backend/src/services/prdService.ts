@@ -2,20 +2,19 @@ import { db } from '../config/database';
 import { generateShareToken, getPaginationInfo } from '../utils/helpers';
 import { teamService } from './teamService';
 import { 
-  ValidationError, 
-  NotFoundError, 
-  ForbiddenError 
-} from '../middleware/errorHandler';
+  ErrorFactory,
+  ValidationHelpers
+} from '../utils/errorHelpers';
 import { PRD, CreatePRDRequest, PRDFilters, PaginatedResponse } from 'prd-creator-shared';
 
 export class PRDService {
   async createPRD(userId: string, data: CreatePRDRequest): Promise<PRD> {
     if (!data.title || data.title.trim().length === 0) {
-      throw new ValidationError('PRD title is required');
+      throw ErrorFactory.validation('PRD title is required');
     }
 
     if (!data.content || data.content.trim().length === 0) {
-      throw new ValidationError('PRD content is required');
+      throw ErrorFactory.validation('PRD content is required');
     }
 
     // If teamId is provided, verify user is a team member
@@ -30,7 +29,7 @@ export class PRDService {
       teamId = user?.current_team_id;
       
       if (!teamId) {
-        throw new ValidationError('Team visibility requires team membership');
+        throw ErrorFactory.validation('Team visibility requires team membership');
       }
     }
 
@@ -56,7 +55,7 @@ export class PRDService {
       .first();
 
     if (!prd) {
-      throw new NotFoundError('PRD not found');
+      throw ErrorFactory.notFound('PRD not found');
     }
 
     // Check access permissions
@@ -80,20 +79,20 @@ export class PRDService {
       if (prd.team_id) {
         await teamService['verifyTeamPermission'](prd.team_id, userId, ['owner', 'admin']);
       } else {
-        throw new ForbiddenError('Cannot edit this PRD');
+        throw ErrorFactory.forbidden('Cannot edit this PRD');
       }
     }
 
     const cleanUpdates: any = {};
     if (updates.title !== undefined) {
       if (!updates.title.trim()) {
-        throw new ValidationError('PRD title cannot be empty');
+        throw ErrorFactory.validation('PRD title cannot be empty');
       }
       cleanUpdates.title = updates.title.trim();
     }
     if (updates.content !== undefined) {
       if (!updates.content.trim()) {
-        throw new ValidationError('PRD content cannot be empty');
+        throw ErrorFactory.validation('PRD content cannot be empty');
       }
       cleanUpdates.content = updates.content;
     }
@@ -124,7 +123,7 @@ export class PRDService {
       if (prd.team_id) {
         await teamService['verifyTeamPermission'](prd.team_id, userId, ['owner', 'admin']);
       } else {
-        throw new ForbiddenError('Cannot delete this PRD');
+        throw ErrorFactory.forbidden('Cannot delete this PRD');
       }
     }
 
@@ -237,11 +236,11 @@ export class PRDService {
     const prd = await this.getPRD(prdId, userId);
 
     if (prd.user_id !== userId) {
-      throw new ForbiddenError('Only PRD owner can share with team');
+      throw ErrorFactory.forbidden('Only PRD owner can share with team');
     }
 
     if (!prd.team_id) {
-      throw new ValidationError('PRD must belong to a team to be shared');
+      throw ErrorFactory.validation('PRD must belong to a team to be shared');
     }
 
     await db('prds')
@@ -259,7 +258,7 @@ export class PRDService {
     const prd = await this.getPRD(prdId, userId);
 
     if (prd.user_id !== userId) {
-      throw new ForbiddenError('Only PRD owner can create public share links');
+      throw ErrorFactory.forbidden('Only PRD owner can create public share links');
     }
 
     let shareToken = prd.share_token;
@@ -291,7 +290,7 @@ export class PRDService {
       .first();
 
     if (!prd) {
-      throw new NotFoundError('Shared PRD not found');
+      throw ErrorFactory.notFound('Shared PRD not found');
     }
 
     // Increment view count
@@ -359,7 +358,7 @@ export class PRDService {
     // Private PRDs require ownership
     if (prd.visibility === 'private') {
       if (!userId || prd.user_id !== userId) {
-        throw new ForbiddenError('Access denied');
+        throw ErrorFactory.forbidden('Access denied');
       }
       return;
     }
@@ -367,7 +366,7 @@ export class PRDService {
     // Team PRDs require team membership
     if (prd.visibility === 'team') {
       if (!userId) {
-        throw new ForbiddenError('Authentication required');
+        throw ErrorFactory.forbidden('Authentication required');
       }
 
       if (prd.user_id === userId) {
@@ -377,7 +376,7 @@ export class PRDService {
       if (prd.team_id) {
         await teamService['verifyTeamMembership'](prd.team_id, userId);
       } else {
-        throw new ForbiddenError('Access denied');
+        throw ErrorFactory.forbidden('Access denied');
       }
     }
   }

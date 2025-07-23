@@ -329,6 +329,7 @@ npm run dev
 ## 🤝 Contributing
 
 We welcome contributions from the community! Please see our [Contributing Guide](./CONTRIBUTING.md) for details on:
+
 - Code style and standards
 - Development workflow
 - Testing requirements

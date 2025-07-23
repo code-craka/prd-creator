@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import OpenAI from 'openai';
-import { ValidationError } from '../middleware/errorHandler';
+import { ErrorFactory } from '../utils/errorHelpers';
 
 export interface AIGenerationRequest {
   prompt: string;
@@ -84,7 +84,7 @@ export class AIService {
     } catch (error) {
       console.error('AI Generation Error:', error);
       const message = error instanceof Error ? error.message : 'Unknown error occurred';
-      throw new ValidationError(`AI generation failed: ${message}`);
+      throw ErrorFactory.validation(`AI generation failed: ${message}`);
     }
   }
 

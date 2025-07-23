@@ -630,7 +630,7 @@ class MarketplaceService {
   // Get creator profile and stats
   async getCreatorProfile(userId: string): Promise<CreatorProfile> {
     const [stats, topTemplates] = await Promise.all([
-      this.fetchCreatorStatistics(userId),
+      MarketplaceService.fetchCreatorStatistics(userId),
       this.fetchTopTemplates(userId)
     ]);
 

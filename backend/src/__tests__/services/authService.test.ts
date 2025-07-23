@@ -1,4 +1,4 @@
-import { authService } from '../../services/authService';
+import { AuthService } from '../../services/authService';
 import { TestDataFactory } from '../utils/testHelpers';
 import { ValidationError, UnauthorizedError, ConflictError } from '../../middleware/errorHandler';
 
@@ -11,7 +11,7 @@ describe('AuthService', () => {
         password: 'password123',
       };
 
-      const result = await authService.register(userData.email, userData.name, userData.password);
+      const result = await AuthService.register(userData.email, userData.name, userData.password);
 
       expect(result).toHaveProperty('user');
       expect(result).toHaveProperty('token');
@@ -22,19 +22,19 @@ describe('AuthService', () => {
 
     it('should throw ValidationError for invalid email', async () => {
       await expect(
-        authService.register('invalid-email', 'Test User', 'password123')
+        AuthService.register('invalid-email', 'Test User', 'password123')
       ).rejects.toThrow(ValidationError);
     });
 
     it('should throw ValidationError for short password', async () => {
       await expect(
-        authService.register('test@example.com', 'Test User', '123')
+        AuthService.register('test@example.com', 'Test User', '123')
       ).rejects.toThrow(ValidationError);
     });
 
     it('should throw ValidationError for short name', async () => {
       await expect(
-        authService.register('test@example.com', 'T', 'password123')
+        AuthService.register('test@example.com', 'T', 'password123')
       ).rejects.toThrow(ValidationError);
     });
 
@@ -44,7 +44,7 @@ describe('AuthService', () => {
       });
 
       await expect(
-        authService.register('existing@example.com', 'Test User', 'password123')
+        AuthService.register('existing@example.com', 'Test User', 'password123')
       ).rejects.toThrow(ConflictError);
     });
   });
@@ -55,7 +55,7 @@ describe('AuthService', () => {
         email: 'login@example.com',
       });
 
-      const result = await authService.login('login@example.com', 'password123');
+      const result = await AuthService.login('login@example.com', 'password123');
 
       expect(result).toHaveProperty('user');
       expect(result).toHaveProperty('token');
@@ -65,13 +65,13 @@ describe('AuthService', () => {
 
     it('should throw ValidationError for invalid email format', async () => {
       await expect(
-        authService.login('invalid-email', 'password123')
+        AuthService.login('invalid-email', 'password123')
       ).rejects.toThrow(ValidationError);
     });
 
     it('should throw UnauthorizedError for non-existent user', async () => {
       await expect(
-        authService.login('nonexistent@example.com', 'password123')
+        AuthService.login('nonexistent@example.com', 'password123')
       ).rejects.toThrow(UnauthorizedError);
     });
 
@@ -81,7 +81,7 @@ describe('AuthService', () => {
       });
 
       await expect(
-        authService.login('wrongpass@example.com', 'wrongpassword')
+        AuthService.login('wrongpass@example.com', 'wrongpassword')
       ).rejects.toThrow(UnauthorizedError);
     });
   });
@@ -90,7 +90,7 @@ describe('AuthService', () => {
     it('should return user data for valid user ID', async () => {
       const user = await TestDataFactory.createUser();
 
-      const result = await authService.getCurrentUser(user.id);
+      const result = await AuthService.getCurrentUser(user.id);
 
       expect(result.id).toBe(user.id);
       expect(result.email).toBe(user.email);
@@ -99,7 +99,7 @@ describe('AuthService', () => {
 
     it('should throw NotFoundError for invalid user ID', async () => {
       await expect(
-        authService.getCurrentUser('non-existent-id')
+        AuthService.getCurrentUser('non-existent-id')
       ).rejects.toThrow('User not found');
     });
   });
@@ -112,7 +112,7 @@ describe('AuthService', () => {
         avatar_url: 'https://example.com/avatar.jpg',
       };
 
-      const result = await authService.updateProfile(user.id, updates);
+      const result = await AuthService.updateProfile(user.id, updates);
 
       expect(result.name).toBe(updates.name);
       expect(result.avatar_url).toBe(updates.avatar_url);
@@ -122,7 +122,7 @@ describe('AuthService', () => {
       const user = await TestDataFactory.createUser();
 
       await expect(
-        authService.updateProfile(user.id, { name: 'A' })
+        AuthService.updateProfile(user.id, { name: 'A' })
       ).rejects.toThrow(ValidationError);
     });
   });
@@ -132,7 +132,7 @@ describe('AuthService', () => {
       const user = await TestDataFactory.createUser();
 
       await expect(
-        authService.changePassword(user.id, 'password123', 'newpassword123')
+        AuthService.changePassword(user.id, 'password123', 'newpassword123')
       ).resolves.not.toThrow();
     });
 
@@ -140,7 +140,7 @@ describe('AuthService', () => {
       const user = await TestDataFactory.createUser();
 
       await expect(
-        authService.changePassword(user.id, 'password123', '123')
+        AuthService.changePassword(user.id, 'password123', '123')
       ).rejects.toThrow(ValidationError);
     });
 
@@ -148,7 +148,7 @@ describe('AuthService', () => {
       const user = await TestDataFactory.createUser();
 
       await expect(
-        authService.changePassword(user.id, 'wrongpassword', 'newpassword123')
+        AuthService.changePassword(user.id, 'wrongpassword', 'newpassword123')
       ).rejects.toThrow(UnauthorizedError);
     });
   });

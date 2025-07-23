@@ -1,11 +1,9 @@
 import { db } from '../config/database';
 import { generateSlug, isValidEmail } from '../utils/helpers';
 import { 
-  ValidationError, 
-  NotFoundError, 
-  ForbiddenError,
-  ConflictError 
-} from '../middleware/errorHandler';
+  ErrorFactory,
+  ValidationHelpers
+} from '../utils/errorHelpers';
 import crypto from 'crypto';
 
 export interface TeamInvitation {
@@ -82,11 +80,11 @@ export class MemberService {
   ): Promise<TeamInvitation> {
     // Verify permissions
     if (!await this.verifyPermission(teamId, inviterId, 'invite')) {
-      throw new ForbiddenError('You do not have permission to invite members');
+      throw ErrorFactory.forbidden('You do not have permission to invite members');
     }
 
     if (!isValidEmail(email)) {
-      throw new ValidationError('Invalid email address');
+      throw ErrorFactory.validation('Invalid email address');
     }
 
     const normalizedEmail = email.toLowerCase();
@@ -99,7 +97,7 @@ export class MemberService {
         .first();
       
       if (existingMember) {
-        throw new ConflictError('User is already a team member');
+        throw ErrorFactory.conflict('User is already a team member');
       }
     }
 
@@ -113,7 +111,7 @@ export class MemberService {
       .first();
 
     if (existingInvitation) {
-      throw new ConflictError('Pending invitation already exists for this email');
+      throw ErrorFactory.conflict('Pending invitation already exists for this email');
     }
 
     // Generate secure token
@@ -144,7 +142,7 @@ export class MemberService {
 
   async getTeamInvitations(teamId: string, userId: string): Promise<TeamInvitation[]> {
     if (!await this.verifyPermission(teamId, userId, 'manage_invitations')) {
-      throw new ForbiddenError('You do not have permission to view invitations');
+      throw ErrorFactory.forbidden('You do not have permission to view invitations');
     }
 
     return db('team_invitations')
@@ -160,7 +158,7 @@ export class MemberService {
 
   async resendInvitation(teamId: string, userId: string, invitationId: string): Promise<void> {
     if (!await this.verifyPermission(teamId, userId, 'manage_invitations')) {
-      throw new ForbiddenError('You do not have permission to resend invitations');
+      throw ErrorFactory.forbidden('You do not have permission to resend invitations');
     }
 
     const invitation = await db('team_invitations')
@@ -168,11 +166,11 @@ export class MemberService {
       .first();
 
     if (!invitation) {
-      throw new NotFoundError('Invitation not found');
+      throw ErrorFactory.notFound('Invitation not found');
     }
 
     if (invitation.status !== 'pending') {
-      throw new ValidationError('Can only resend pending invitations');
+      throw ErrorFactory.validation('Can only resend pending invitations');
     }
 
     // Update expiry and generate new token
@@ -197,7 +195,7 @@ export class MemberService {
 
   async cancelInvitation(teamId: string, userId: string, invitationId: string): Promise<void> {
     if (!await this.verifyPermission(teamId, userId, 'manage_invitations')) {
-      throw new ForbiddenError('You do not have permission to cancel invitations');
+      throw ErrorFactory.forbidden('You do not have permission to cancel invitations');
     }
 
     const invitation = await db('team_invitations')
@@ -205,11 +203,11 @@ export class MemberService {
       .first();
 
     if (!invitation) {
-      throw new NotFoundError('Invitation not found');
+      throw ErrorFactory.notFound('Invitation not found');
     }
 
     if (invitation.status !== 'pending') {
-      throw new ValidationError('Can only cancel pending invitations');
+      throw ErrorFactory.validation('Can only cancel pending invitations');
     }
 
     await db('team_invitations')
@@ -236,7 +234,7 @@ export class MemberService {
     reason?: string
   ): Promise<void> {
     if (!await this.verifyPermission(teamId, adminId, 'change_role')) {
-      throw new ForbiddenError('You do not have permission to change member roles');
+      throw ErrorFactory.forbidden('You do not have permission to change member roles');
     }
 
     // Get current member
@@ -245,17 +243,17 @@ export class MemberService {
       .first();
 
     if (!member) {
-      throw new NotFoundError('Team member not found');
+      throw ErrorFactory.notFound('Team member not found');
     }
 
     // Can't change your own role
     if (adminId === memberId) {
-      throw new ForbiddenError('Cannot change your own role');
+      throw ErrorFactory.forbidden('Cannot change your own role');
     }
 
     // Can't change owner role
     if (member.role === 'owner') {
-      throw new ForbiddenError('Cannot change owner role');
+      throw ErrorFactory.forbidden('Cannot change owner role');
     }
 
     // Set current user context for triggers
@@ -284,7 +282,7 @@ export class MemberService {
 
   async removeMember(teamId: string, adminId: string, memberId: string, reason?: string): Promise<void> {
     if (!await this.verifyPermission(teamId, adminId, 'remove')) {
-      throw new ForbiddenError('You do not have permission to remove members');
+      throw ErrorFactory.forbidden('You do not have permission to remove members');
     }
 
     const member = await db('team_members')
@@ -292,17 +290,17 @@ export class MemberService {
       .first();
 
     if (!member) {
-      throw new NotFoundError('Team member not found');
+      throw ErrorFactory.notFound('Team member not found');
     }
 
     // Can't remove yourself
     if (adminId === memberId) {
-      throw new ForbiddenError('Cannot remove yourself from the team');
+      throw ErrorFactory.forbidden('Cannot remove yourself from the team');
     }
 
     // Can't remove owner
     if (member.role === 'owner') {
-      throw new ForbiddenError('Cannot remove team owner');
+      throw ErrorFactory.forbidden('Cannot remove team owner');
     }
 
     const adminMember = await db('team_members')
@@ -311,7 +309,7 @@ export class MemberService {
 
     // Only owners can remove admins
     if (member.role === 'admin' && adminMember?.role !== 'owner') {
-      throw new ForbiddenError('Only owners can remove admins');
+      throw ErrorFactory.forbidden('Only owners can remove admins');
     }
 
     await db.transaction(async (trx) => {
@@ -380,7 +378,7 @@ export class MemberService {
       .first();
 
     if (!member) {
-      throw new ForbiddenError('Not a team member');
+      throw ErrorFactory.forbidden('Not a team member');
     }
 
     return db('member_activity_logs')
@@ -401,7 +399,7 @@ export class MemberService {
       .first();
 
     if (!member || !['owner', 'admin'].includes(member.role)) {
-      throw new ForbiddenError('Insufficient permissions to view role change history');
+      throw ErrorFactory.forbidden('Insufficient permissions to view role change history');
     }
 
     return db('role_change_history')
@@ -423,7 +421,7 @@ export class MemberService {
       .first();
 
     if (!member) {
-      throw new ForbiddenError('Not a team member');
+      throw ErrorFactory.forbidden('Not a team member');
     }
 
     return db('team_members')
@@ -453,20 +451,20 @@ export class MemberService {
       .first();
 
     if (!invitation) {
-      throw new NotFoundError('Invalid or expired invitation');
+      throw ErrorFactory.notFound('Invalid or expired invitation');
     }
 
     if (new Date(invitation.expires_at) < new Date()) {
       await db('team_invitations')
         .where('id', invitation.id)
         .update({ status: 'expired' });
-      throw new ValidationError('Invitation has expired');
+      throw ErrorFactory.validation('Invitation has expired');
     }
 
     // Check if user email matches invitation
     const user = await db('users').where('id', userId).first();
     if (!user || user.email !== invitation.email) {
-      throw new ForbiddenError('This invitation is not for your email address');
+      throw ErrorFactory.forbidden('This invitation is not for your email address');
     }
 
     // Check if already a member
@@ -475,7 +473,7 @@ export class MemberService {
       .first();
 
     if (existingMember) {
-      throw new ConflictError('You are already a member of this team');
+      throw ErrorFactory.conflict('You are already a member of this team');
     }
 
     await db.transaction(async (trx) => {
