@@ -9,7 +9,7 @@ import {
   UpdateProfileRequest,
   CompleteStepRequest,
   RateTemplateRequest
-} from '../types/onboarding';
+} from 'prd-creator-shared';
 
 class OnboardingService {
   private baseUrl = '/onboarding';

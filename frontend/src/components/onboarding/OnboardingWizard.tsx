@@ -14,7 +14,7 @@ import ProfileSetup from './ProfileSetup';
 import TemplateSelection from './TemplateSelection';
 import TutorialPlayer from './TutorialPlayer';
 import ProgressIndicator from './ProgressIndicator';
-import { OnboardingWizardProps, OnboardingStep } from '../../types/onboarding';
+import { OnboardingWizardProps, OnboardingStep } from 'prd-creator-shared';
 
 const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ 
   onComplete, 

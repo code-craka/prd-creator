@@ -9,7 +9,7 @@ import {
   OnboardingState,
   OnboardingActions,
   TutorialStep
-} from '../types/onboarding';
+} from 'prd-creator-shared';
 
 interface UseOnboardingReturn extends OnboardingState, OnboardingActions {
   // Helper methods
@@ -319,7 +319,7 @@ export const useTemplateRecommendations = () => {
 
 // Hook for tutorial management
 export const useTutorial = (category?: string) => {
-  const [steps, setSteps] = useState<import('../types/onboarding').TutorialStep[]>([]);
+  const [steps, setSteps] = useState<TutorialStep[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);

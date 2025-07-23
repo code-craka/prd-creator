@@ -1,4 +1,6 @@
-// Match backend types
+// Shared onboarding type definitions for PRD Creator
+// These types are used across both frontend and backend
+
 export interface UserOnboarding {
   id: string;
   user_id: string;
@@ -14,10 +16,10 @@ export interface UserOnboarding {
   experience_level?: string;
   preferences: Record<string, any>;
   completion_percentage: number;
-  started_at: string;
-  completed_at?: string;
-  created_at: string;
-  updated_at: string;
+  started_at: Date | string;
+  completed_at?: Date | string;
+  created_at: Date | string;
+  updated_at: Date | string;
 }
 
 export interface PRDTemplate {
@@ -36,8 +38,8 @@ export interface PRDTemplate {
   rating: number;
   rating_count: number;
   created_by?: string;
-  created_at: string;
-  updated_at: string;
+  created_at: Date | string;
+  updated_at: Date | string;
 }
 
 export interface TutorialStep {
@@ -52,8 +54,8 @@ export interface TutorialStep {
   prerequisites: string[];
   is_required: boolean;
   is_active: boolean;
-  created_at: string;
-  updated_at: string;
+  created_at: Date | string;
+  updated_at: Date | string;
   progress?: UserTutorialProgress | null;
 }
 
@@ -62,12 +64,22 @@ export interface UserTutorialProgress {
   user_id: string;
   step_id: string;
   completed: boolean;
-  started_at: string;
-  completed_at?: string;
+  started_at: Date | string;
+  completed_at?: Date | string;
   time_spent_seconds: number;
   interaction_data: Record<string, any>;
-  created_at: string;
-  updated_at: string;
+  created_at: Date | string;
+  updated_at: Date | string;
+}
+
+export interface TemplateRating {
+  id: string;
+  template_id: string;
+  user_id: string;
+  rating: number;
+  review?: string;
+  created_at: Date | string;
+  updated_at: Date | string;
 }
 
 export interface IndustryClassification {
@@ -79,6 +91,8 @@ export interface IndustryClassification {
   recommended_templates: string[];
   is_active: boolean;
   sort_order: number;
+  created_at?: Date | string;
+  updated_at?: Date | string;
 }
 
 export interface CompanyTypeClassification {
@@ -90,8 +104,25 @@ export interface CompanyTypeClassification {
   recommended_features: string[];
   is_active: boolean;
   sort_order: number;
+  created_at?: Date | string;
+  updated_at?: Date | string;
 }
 
+export interface OnboardingAnalytics {
+  id: string;
+  user_id: string;
+  event_type: string;
+  event_category: string;
+  step_id?: string;
+  event_data: Record<string, any>;
+  time_spent_seconds: number;
+  user_agent?: string;
+  device_type?: string;
+  created_at: Date | string;
+  updated_at: Date | string;
+}
+
+// Response Types
 export interface OnboardingProgress {
   onboarding: UserOnboarding;
   tutorialSteps: TutorialStep[];
@@ -107,6 +138,28 @@ export interface TemplateRecommendation {
   estimatedTimeToComplete: number;
 }
 
+// Request Types
+export interface UpdateProfileRequest {
+  companyType?: string;
+  industry?: string;
+  teamSize?: string;
+  experienceLevel?: string;
+  preferences?: Record<string, any>;
+}
+
+export interface CompleteStepRequest {
+  stepId: string;
+  timeSpentSeconds?: number;
+  interactionData?: Record<string, any>;
+}
+
+export interface RateTemplateRequest {
+  templateId: string;
+  rating: number;
+  review?: string;
+}
+
+// Template Content Structure
 export interface TemplateContent {
   sections: TemplateSection[];
   metadata: {
@@ -130,6 +183,7 @@ export interface TemplateSection {
   tips?: string[];
 }
 
+// Tutorial Content Structure
 export interface TutorialContent {
   type: 'interactive' | 'video' | 'text' | 'guided';
   steps: TutorialContentStep[];
@@ -164,7 +218,52 @@ export interface TutorialResource {
   description?: string;
 }
 
-// Component Props
+// Analytics Types
+export interface OnboardingMetrics {
+  totalUsers: number;
+  completedUsers: number;
+  completionRate: number;
+  avgCompletionTimeHours: number;
+  stepAnalytics: StepAnalytics[];
+  industryBreakdown: IndustryMetrics[];
+  companyTypeBreakdown: CompanyTypeMetrics[];
+  timeToComplete: {
+    median: number;
+    average: number;
+    percentiles: {
+      p25: number;
+      p50: number;
+      p75: number;
+      p90: number;
+    };
+  };
+}
+
+export interface StepAnalytics {
+  stepId: string;
+  stepTitle: string;
+  startedCount: number;
+  completedCount: number;
+  completionRate: number;
+  avgTimeSpent: number;
+  dropOffRate: number;
+}
+
+export interface IndustryMetrics {
+  industry: string;
+  userCount: number;
+  completionRate: number;
+  popularTemplates: string[];
+}
+
+export interface CompanyTypeMetrics {
+  companyType: string;
+  userCount: number;
+  completionRate: number;
+  avgTimeToComplete: number;
+}
+
+// Frontend-specific Component Props (optional - only used in frontend)
 export interface OnboardingWizardProps {
   onComplete: () => void;
   onSkip?: () => void;
@@ -200,28 +299,7 @@ export interface ProgressIndicatorProps {
   className?: string;
 }
 
-// API Request/Response types
-export interface UpdateProfileRequest {
-  companyType?: string;
-  industry?: string;
-  teamSize?: string;
-  experienceLevel?: string;
-  preferences?: Record<string, any>;
-}
-
-export interface CompleteStepRequest {
-  stepId: string;
-  timeSpentSeconds?: number;
-  interactionData?: Record<string, any>;
-}
-
-export interface RateTemplateRequest {
-  templateId: string;
-  rating: number;
-  review?: string;
-}
-
-// State management
+// State management (frontend-specific)
 export interface OnboardingState {
   progress: OnboardingProgress | null;
   isLoading: boolean;

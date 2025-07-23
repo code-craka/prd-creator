@@ -9,7 +9,7 @@ import {
   Search
 } from 'lucide-react';
 import { onboardingService } from '../../services/onboardingService';
-import { TemplateSelectionProps, PRDTemplate } from '../../types/onboarding';
+import { TemplateSelectionProps, PRDTemplate } from 'prd-creator-shared';
 
 const TemplateSelection: React.FC<TemplateSelectionProps> = ({ 
   recommendations, 

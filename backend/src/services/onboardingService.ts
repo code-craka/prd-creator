@@ -8,7 +8,7 @@ import {
   IndustryClassification,
   CompanyTypeClassification,
   OnboardingAnalytics
-} from '../types/onboarding';
+} from 'prd-creator-shared';
 
 export class OnboardingService {
   // Initialize onboarding for a new user

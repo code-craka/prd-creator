@@ -8,7 +8,7 @@ import {
   CompanyType, 
   TeamSize, 
   ExperienceLevel 
-} from '../../types/onboarding';
+} from 'prd-creator-shared';
 
 const ProfileSetup: React.FC<ProfileSetupProps> = ({ onComplete, initialData }) => {
   const { industries, companyTypes, isLoading } = useOnboarding(false);

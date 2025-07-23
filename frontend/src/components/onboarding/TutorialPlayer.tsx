@@ -9,7 +9,7 @@ import {
   SkipForward,
   BookOpen
 } from 'lucide-react';
-import { TutorialStep } from '../../types/onboarding';
+import { TutorialStep } from 'prd-creator-shared';
 import { useOnboarding } from '../../hooks/useOnboarding';
 
 interface TutorialPlayerProps {

@@ -10,7 +10,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { onboardingService } from '../../services/onboardingService';
-import { ProgressIndicatorProps } from '../../types/onboarding';
+import { ProgressIndicatorProps } from 'prd-creator-shared';
 
 const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({ 
   progress, 

@@ -119,3 +119,6 @@ export interface PaginatedResponse<T = any> {
     pages: number;
   };
 }
+
+// Export onboarding types
+export * from './onboarding';
