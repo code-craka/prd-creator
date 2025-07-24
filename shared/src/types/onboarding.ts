@@ -139,7 +139,7 @@ export interface TemplateRecommendation {
 }
 
 // Request Types
-export interface UpdateProfileRequest {
+export interface UpdateOnboardingProfileRequest {
   companyType?: string;
   industry?: string;
   teamSize?: string;
@@ -312,7 +312,7 @@ export interface OnboardingState {
 
 export interface OnboardingActions {
   initializeOnboarding: () => Promise<void>;
-  updateProfile: (data: UpdateProfileRequest) => Promise<void>;
+  updateProfile: (data: UpdateOnboardingProfileRequest) => Promise<void>;
   startStep: (stepId: string) => Promise<void>;
   completeStep: (stepId: string, timeSpent?: number) => Promise<void>;
   skipOnboarding: () => Promise<void>;

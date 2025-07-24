@@ -1,5 +1,6 @@
 import { db } from '../config/database';
 import { ViralTrackingService } from './viralTrackingService';
+import { CreatorProfile } from 'prd-creator-shared';
 
 export interface MarketplaceTemplate {
   id: string;
@@ -75,22 +76,6 @@ export interface TemplateReview {
   is_verified_purchase: boolean;
   created_at: Date;
   updated_at: Date;
-}
-
-export interface CreatorProfile {
-  user_id: string;
-  total_templates: number;
-  total_sales: number;
-  total_revenue: number;
-  average_rating: number;
-  total_downloads: number;
-  featured_templates: number;
-  top_templates: Array<{
-    name: string;
-    downloads: number;
-    rating: number;
-    revenue: number;
-  }>;
 }
 
 class MarketplaceService {

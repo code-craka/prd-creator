@@ -3,6 +3,7 @@
 > **Transform vague ideas into professional Product Requirements Documents with AI assistance**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/Version-1.2.0-brightgreen.svg)](https://github.com/code-craka/prd-creator/releases)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18.2+-61DAFB.svg)](https://reactjs.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18.0+-green.svg)](https://nodejs.org/)
@@ -107,6 +108,13 @@ With team collaboration features, beautiful glassmorphism design, and AI integra
 - **Styling**: Tailwind CSS with custom glassmorphism components
 - **Routing**: React Router v6 with protected routes
 - **Forms**: React Hook Form with Zod validation
+
+### Shared Architecture
+
+- **Shared Package**: Centralized TypeScript types and utilities
+- **Type Safety**: Unified validation schemas (Joi ↔ Zod)
+- **Monorepo Structure**: Organized workspace with cross-package consistency
+- **Service Layer**: Consistent business logic patterns across packages
 
 ### AI & External Services
 

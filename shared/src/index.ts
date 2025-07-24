@@ -7,3 +7,4 @@ export * from './validation';
 // Export shared services
 export * from './services/publicGalleryService';
 export * from './services/memberService';
+export * from './services/prdService';

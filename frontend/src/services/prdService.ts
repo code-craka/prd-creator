@@ -1,5 +1,11 @@
 import { api, apiCall, ApiResponse } from './api';
-import { PRD, CreatePRDRequest, PRDFilters, PaginatedResponse } from 'prd-creator-shared';
+import { 
+  PRD, 
+  CreatePRDRequest, 
+  PRDFilters, 
+  PaginatedResponse,
+  buildPRDQueryParams 
+} from 'prd-creator-shared';
 
 export interface PRDWithAuthor extends PRD {
   author_name: string;
@@ -8,17 +14,11 @@ export interface PRDWithAuthor extends PRD {
 
 export const prdService = {
   async createPRD(data: CreatePRDRequest): Promise<PRD> {
-    return apiCall(() => api.post<ApiResponse<{ prd: PRD }>>('/prds', data));
+    return apiCall(() => api.post<ApiResponse<PRD>>('/prds', data));
   },
 
   async getUserPRDs(filters: PRDFilters = {}): Promise<PaginatedResponse<PRD>> {
-    const params = new URLSearchParams();
-    
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params.append(key, String(value));
-      }
-    });
+    const params = buildPRDQueryParams(filters);
 
     return apiCall(() => 
       api.get<ApiResponse<PaginatedResponse<PRD>>>(`/prds?${params.toString()}`)
@@ -26,13 +26,7 @@ export const prdService = {
   },
 
   async getPublicPRDs(filters: PRDFilters = {}): Promise<PaginatedResponse<PRDWithAuthor>> {
-    const params = new URLSearchParams();
-    
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params.append(key, String(value));
-      }
-    });
+    const params = buildPRDQueryParams(filters);
 
     return apiCall(() => 
       api.get<ApiResponse<PaginatedResponse<PRDWithAuthor>>>(`/prds/public?${params.toString()}`)
@@ -40,11 +34,11 @@ export const prdService = {
   },
 
   async getPRD(id: string): Promise<PRD> {
-    return apiCall(() => api.get<ApiResponse<{ prd: PRD }>>(`/prds/${id}`));
+    return apiCall(() => api.get<ApiResponse<PRD>>(`/prds/${id}`));
   },
 
   async updatePRD(id: string, data: Partial<CreatePRDRequest>): Promise<PRD> {
-    return apiCall(() => api.put<ApiResponse<{ prd: PRD }>>(`/prds/${id}`, data));
+    return apiCall(() => api.put<ApiResponse<PRD>>(`/prds/${id}`, data));
   },
 
   async deletePRD(id: string): Promise<void> {

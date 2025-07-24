@@ -1,31 +1,15 @@
 import { api, apiCall, ApiResponse } from './api';
-import { User } from 'prd-creator-shared';
+import { 
+  User, 
+  LoginRequest, 
+  RegisterRequest, 
+  AuthResponse, 
+  UpdateProfileRequest, 
+  ChangePasswordRequest 
+} from 'prd-creator-shared';
 
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface RegisterRequest {
-  email: string;
-  name: string;
-  password: string;
-}
-
-export interface AuthResponse {
-  user: User;
-  token: string;
-}
-
-export interface UpdateProfileRequest {
-  name?: string;
-  avatar_url?: string;
-}
-
-export interface ChangePasswordRequest {
-  currentPassword: string;
-  newPassword: string;
-}
+// Re-export types for components
+export type { LoginRequest, RegisterRequest, AuthResponse, UpdateProfileRequest, ChangePasswordRequest };
 
 export const authService = {
   async login(data: LoginRequest): Promise<AuthResponse> {

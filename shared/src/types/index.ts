@@ -99,3 +99,6 @@ export * from './team';
 
 // Export analytics types
 export * from './analytics';
+
+// Export user profile types
+export * from './userProfile';

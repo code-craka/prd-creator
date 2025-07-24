@@ -1,6 +1,6 @@
 {
   "name": "prd-creator-shared",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Shared types and utilities for PRD Creator",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

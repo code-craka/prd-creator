@@ -1,20 +1,22 @@
 import { db } from '../config/database';
 import { generateShareToken, getPaginationInfo } from '../utils/helpers';
 import { teamService } from './teamService';
+import { ErrorFactory } from '../utils/errorHelpers';
 import { 
-  ErrorFactory,
-  ValidationHelpers
-} from '../utils/errorHelpers';
-import { PRD, CreatePRDRequest, PRDFilters, PaginatedResponse } from 'prd-creator-shared';
+  PRD, 
+  CreatePRDRequest, 
+  PRDFilters, 
+  PaginatedResponse,
+  validatePRDData,
+  validatePRDFilters
+} from 'prd-creator-shared';
 
 export class PRDService {
   async createPRD(userId: string, data: CreatePRDRequest): Promise<PRD> {
-    if (!data.title || data.title.trim().length === 0) {
-      throw ErrorFactory.validation('PRD title is required');
-    }
-
-    if (!data.content || data.content.trim().length === 0) {
-      throw ErrorFactory.validation('PRD content is required');
+    // Use shared validation
+    const validationResult = validatePRDData(data);
+    if (!validationResult.isValid) {
+      throw ErrorFactory.validation(validationResult.errors.join(', '));
     }
 
     // If teamId is provided, verify user is a team member
@@ -83,17 +85,19 @@ export class PRDService {
       }
     }
 
+    // Validate individual fields if they are being updated
+    if (updates.title !== undefined && (!updates.title || updates.title.trim().length === 0)) {
+      throw ErrorFactory.validation('PRD title cannot be empty');
+    }
+    if (updates.content !== undefined && (!updates.content || updates.content.trim().length === 0)) {
+      throw ErrorFactory.validation('PRD content cannot be empty');
+    }
+
     const cleanUpdates: any = {};
     if (updates.title !== undefined) {
-      if (!updates.title.trim()) {
-        throw ErrorFactory.validation('PRD title cannot be empty');
-      }
       cleanUpdates.title = updates.title.trim();
     }
     if (updates.content !== undefined) {
-      if (!updates.content.trim()) {
-        throw ErrorFactory.validation('PRD content cannot be empty');
-      }
       cleanUpdates.content = updates.content;
     }
     if (updates.visibility !== undefined) {
@@ -131,6 +135,12 @@ export class PRDService {
   }
 
   async getUserPRDs(userId: string, filters: PRDFilters = {}): Promise<PaginatedResponse<PRD>> {
+    // Validate filters using shared validation
+    const validationResult = validatePRDFilters(filters);
+    if (!validationResult.isValid) {
+      throw ErrorFactory.validation(validationResult.errors.join(', '));
+    }
+
     let query = db('prds')
       .where('user_id', userId);
 

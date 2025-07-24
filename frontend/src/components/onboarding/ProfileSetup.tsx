@@ -1,23 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronDown, Building, Users, TrendingUp, User } from 'lucide-react';
+import React, { useState } from 'react';
+import { Building, Users, TrendingUp, User } from 'lucide-react';
 import { useOnboarding } from '../../hooks/useOnboarding';
 import { onboardingService } from '../../services/onboardingService';
 import { 
   ProfileSetupProps, 
-  ProfileData, 
-  CompanyType, 
-  TeamSize, 
-  ExperienceLevel 
+  ProfileData 
 } from 'prd-creator-shared';
 
 const ProfileSetup: React.FC<ProfileSetupProps> = ({ onComplete, initialData }) => {
   const { industries, companyTypes, isLoading } = useOnboarding(false);
   
   const [formData, setFormData] = useState<ProfileData>({
-    companyType: initialData?.company_type || '',
+    companyType: initialData?.companyType || '',
     industry: initialData?.industry || '',
-    teamSize: initialData?.team_size || '',
-    experienceLevel: initialData?.experience_level || '',
+    teamSize: initialData?.teamSize || '',
+    experienceLevel: initialData?.experienceLevel || '',
     preferences: initialData?.preferences || {}
   });
 

@@ -2,6 +2,17 @@
 
 Thank you for your interest in contributing to PRD Creator! This guide will help you get started with contributing to this project.
 
+## 🎯 About PRD Creator v1.2.0
+
+PRD Creator is an AI-powered SaaS application that helps product managers, entrepreneurs, and development teams transform vague product ideas into professional Product Requirements Documents (PRDs). This version features enhanced type safety, shared package architecture, and comprehensive team collaboration tools.
+
+### Current Architecture
+
+- **Shared Package**: Centralized type definitions and utilities
+- **Frontend**: React 18.2+ with TypeScript and glassmorphism design
+- **Backend**: Node.js/Express with PostgreSQL and comprehensive API
+- **AI Integration**: OpenAI GPT-4 and Anthropic Claude support
+
 ## 🎯 How to Contribute
 
 ### Types of Contributions

@@ -1,6 +1,6 @@
 {
   "name": "prd-creator",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "private": true,
   "description": "AI-powered PRD creation tool with team collaboration",
   "scripts": {

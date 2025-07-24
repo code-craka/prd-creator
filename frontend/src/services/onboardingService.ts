@@ -6,7 +6,7 @@ import {
   TutorialStep,
   IndustryClassification,
   CompanyTypeClassification,
-  UpdateProfileRequest,
+  UpdateOnboardingProfileRequest,
   CompleteStepRequest,
   RateTemplateRequest
 } from 'prd-creator-shared';
@@ -27,7 +27,7 @@ class OnboardingService {
   }
 
   // Update user profile during onboarding
-  async updateProfile(profileData: UpdateProfileRequest): Promise<UserOnboarding> {
+  async updateProfile(profileData: UpdateOnboardingProfileRequest): Promise<UserOnboarding> {
     const response = await api.put(`${this.baseUrl}/profile`, profileData);
     return response.data.data;
   }

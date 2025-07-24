@@ -5,7 +5,7 @@ import {
   TemplateRecommendation,
   IndustryClassification,
   CompanyTypeClassification,
-  UpdateProfileRequest,
+  UpdateOnboardingProfileRequest,
   OnboardingState,
   OnboardingActions,
   TutorialStep
@@ -79,7 +79,7 @@ export const useOnboarding = (autoLoad: boolean = true): UseOnboardingReturn => 
   }, [loadProgress]);
 
   // Update user profile
-  const updateProfile = useCallback(async (profileData: UpdateProfileRequest) => {
+  const updateProfile = useCallback(async (profileData: UpdateOnboardingProfileRequest) => {
     try {
       setState(prev => ({ ...prev, isLoading: true, error: null }));
       await onboardingService.updateProfile(profileData);

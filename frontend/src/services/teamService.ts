@@ -21,7 +21,8 @@ export interface UpdateTeamRequest {
 
 export const teamService = {
   async createTeam(data: CreateTeamRequest): Promise<Team> {
-    return apiCall(() => api.post<ApiResponse<{ team: Team }>>('/teams', data));
+    const response = await apiCall(() => api.post<ApiResponse<{ team: Team }>>('/teams', data));
+    return response.team;
   },
 
   async getUserTeams(): Promise<TeamWithRole[]> {
@@ -30,15 +31,18 @@ export const teamService = {
   },
 
   async switchTeam(teamId: string): Promise<Team> {
-    return apiCall(() => api.post<ApiResponse<{ team: Team }>>('/teams/switch', { teamId }));
+    const response = await apiCall(() => api.post<ApiResponse<{ team: Team }>>('/teams/switch', { teamId }));
+    return response.team;
   },
 
   async getTeam(teamId: string): Promise<Team> {
-    return apiCall(() => api.get<ApiResponse<{ team: Team }>>(`/teams/${teamId}`));
+    const response = await apiCall(() => api.get<ApiResponse<{ team: Team }>>(`/teams/${teamId}`));
+    return response.team;
   },
 
   async updateTeam(teamId: string, data: UpdateTeamRequest): Promise<Team> {
-    return apiCall(() => api.put<ApiResponse<{ team: Team }>>(`/teams/${teamId}`, data));
+    const response = await apiCall(() => api.put<ApiResponse<{ team: Team }>>(`/teams/${teamId}`, data));
+    return response.team;
   },
 
   async deleteTeam(teamId: string): Promise<void> {
