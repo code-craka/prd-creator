@@ -4,16 +4,16 @@ import { requireAuth } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
 import { asyncWrapper, safeParsePositiveInt } from '../utils/helpers';
 import { onboardingService } from '../services/onboardingService';
-import { AuthenticatedRequest } from '../middleware/auth';
+import { BackendAuthenticatedRequest } from '../middleware/auth';
 
 const router = express.Router();
 
 // Initialize onboarding for current user
 router.post('/initialize',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const onboarding = await onboardingService.initializeUserOnboarding(req.user!.id);
-    
+
     res.json({
       success: true,
       data: onboarding
@@ -24,9 +24,9 @@ router.post('/initialize',
 // Get current user's onboarding progress
 router.get('/progress',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
-    const progress = await onboardingService.getUserOnboardingProgress(req.user!.id);
-    
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
+    const progress = await onboardingService.getUserOnboardingProgress(req.user.id);
+
     res.json({
       success: true,
       data: progress
@@ -45,9 +45,9 @@ router.put('/profile',
     body('preferences').optional().isObject()
   ],
   validateRequest,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const onboarding = await onboardingService.updateUserProfile(req.user!.id, req.body);
-    
+
     res.json({
       success: true,
       data: onboarding
@@ -62,10 +62,10 @@ router.get('/templates/recommendations',
     query('limit').optional().isInt({ min: 1, max: 50 }).toInt()
   ],
   validateRequest,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const limit = safeParsePositiveInt(req.query.limit as string, 10);
     const recommendations = await onboardingService.getTemplateRecommendations(req.user!.id, limit);
-    
+
     res.json({
       success: true,
       data: recommendations
@@ -80,10 +80,10 @@ router.get('/tutorial/steps',
     query('category').optional().isLength({ min: 1, max: 50 })
   ],
   validateRequest,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const category = req.query.category as string;
     const steps = await onboardingService.getTutorialSteps(category);
-    
+
     res.json({
       success: true,
       data: steps
@@ -98,10 +98,10 @@ router.post('/tutorial/steps/:stepId/start',
     param('stepId').isUUID()
   ],
   validateRequest,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { stepId } = req.params;
     await onboardingService.startTutorialStep(req.user!.id, stepId);
-    
+
     res.json({
       success: true,
       message: 'Tutorial step started'
@@ -118,12 +118,12 @@ router.post('/tutorial/steps/:stepId/complete',
     body('interactionData').optional().isObject()
   ],
   validateRequest,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { stepId } = req.params;
     const { timeSpentSeconds = 0 } = req.body;
-    
+
     await onboardingService.completeTutorialStep(req.user!.id, stepId, timeSpentSeconds);
-    
+
     res.json({
       success: true,
       message: 'Tutorial step completed'
@@ -134,9 +134,9 @@ router.post('/tutorial/steps/:stepId/complete',
 // Mark first PRD as created (called internally when user creates first PRD)
 router.post('/milestone/first-prd',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     await onboardingService.markFirstPRDCreated(req.user!.id);
-    
+
     res.json({
       success: true,
       message: 'First PRD milestone marked'
@@ -147,9 +147,9 @@ router.post('/milestone/first-prd',
 // Mark team invitation as sent (called internally when user sends invitation)
 router.post('/milestone/team-invitation',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     await onboardingService.markTeamInvitationSent(req.user!.id);
-    
+
     res.json({
       success: true,
       message: 'Team invitation milestone marked'
@@ -160,9 +160,9 @@ router.post('/milestone/team-invitation',
 // Get industry classifications
 router.get('/classifications/industries',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const industries = await onboardingService.getIndustryClassifications();
-    
+
     res.json({
       success: true,
       data: industries
@@ -173,9 +173,9 @@ router.get('/classifications/industries',
 // Get company type classifications
 router.get('/classifications/company-types',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const companyTypes = await onboardingService.getCompanyTypeClassifications();
-    
+
     res.json({
       success: true,
       data: companyTypes
@@ -192,12 +192,12 @@ router.post('/templates/:templateId/rate',
     body('review').optional().isLength({ min: 1, max: 1000 })
   ],
   validateRequest,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { templateId } = req.params;
     const { rating, review } = req.body;
-    
+
     await onboardingService.rateTemplate(req.user!.id, templateId, rating, review);
-    
+
     res.json({
       success: true,
       message: 'Template rated successfully'
@@ -212,11 +212,11 @@ router.get('/analytics',
     query('timeRange').optional().isIn(['7d', '30d', '90d'])
   ],
   validateRequest,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     // TODO: Add admin role check
     const timeRange = req.query.timeRange as string || '30d';
     const analytics = await onboardingService.getOnboardingAnalytics(timeRange);
-    
+
     res.json({
       success: true,
       data: analytics
@@ -227,12 +227,12 @@ router.get('/analytics',
 // Skip onboarding (for experienced users)
 router.post('/skip',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     // Mark most milestones as completed but not tutorial
     await onboardingService.updateUserProfile(req.user!.id, {
       experienceLevel: 'expert'
     });
-    
+
     res.json({
       success: true,
       message: 'Onboarding skipped'

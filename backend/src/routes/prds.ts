@@ -1,5 +1,5 @@
 import express, { Router } from 'express';
-import { requireAuth, optionalAuth, AuthenticatedRequest } from '../middleware/auth';
+import { requireAuth, optionalAuth, BackendAuthenticatedRequest } from '../middleware/auth';
 import { prdService } from '../services/prdService';
 import { validateBody, validateQuery } from '../middleware/validation';
 import { validationSchemas } from '../schemas/validationSchemas';
@@ -11,7 +11,7 @@ const router = Router();
 router.post('/', 
   requireAuth,
   validateBody(validationSchemas.prd.create),
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const prd = await prdService.createPRD(req.user.id, req.body);
     
     res.status(201).json({
@@ -26,7 +26,7 @@ router.post('/',
 router.get('/', 
   requireAuth,
   validateQuery(validationSchemas.prd.filters),
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const result = await prdService.getUserPRDs(req.user.id, req.query as any);
     
     res.json({
@@ -54,7 +54,7 @@ router.get('/public',
 // Get PRD by ID
 router.get('/:id', 
   optionalAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { id } = req.params;
     
     const prd = await prdService.getPRD(id, req.user?.id);
@@ -70,7 +70,7 @@ router.get('/:id',
 router.put('/:id',
   requireAuth,
   validateBody(validationSchemas.prd.update),
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { id } = req.params;
     
     const prd = await prdService.updatePRD(id, req.user.id, req.body);
@@ -86,7 +86,7 @@ router.put('/:id',
 // Delete PRD
 router.delete('/:id',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { id } = req.params;
     
     await prdService.deletePRD(id, req.user.id);
@@ -101,7 +101,7 @@ router.delete('/:id',
 // Share PRD with team
 router.post('/:id/share-team',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { id } = req.params;
     
     await prdService.sharePRDWithTeam(id, req.user.id);
@@ -116,7 +116,7 @@ router.post('/:id/share-team',
 // Create public share link
 router.post('/:id/share-public',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { id } = req.params;
     
     const shareToken = await prdService.createPublicShareLink(id, req.user.id);

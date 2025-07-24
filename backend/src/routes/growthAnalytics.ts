@@ -4,7 +4,7 @@ import { requireAuth } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
 import { asyncWrapper } from '../utils/helpers';
 import { growthAnalyticsService } from '../services/growthAnalyticsService';
-import { AuthenticatedRequest } from '../middleware/auth';
+import { BackendAuthenticatedRequest } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -15,7 +15,7 @@ router.get('/dashboard',
     query('timeRange').optional().isIn(['7d', '30d', '90d'])
   ],
   validateRequest,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const timeRange = req.query.timeRange as '7d' | '30d' | '90d' || '30d';
 
     const dashboard = await growthAnalyticsService.getGrowthDashboard(timeRange);
@@ -34,7 +34,7 @@ router.get('/funnel',
     query('timeRange').optional().isIn(['7d', '30d', '90d'])
   ],
   validateRequest,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const timeRange = req.query.timeRange as '7d' | '30d' | '90d' || '30d';
     const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90;
     const startDate = new Date(Date.now() - (days * 24 * 60 * 60 * 1000));
@@ -56,7 +56,7 @@ router.get('/metrics',
     query('timeRange').optional().isIn(['7d', '30d', '90d'])
   ],
   validateRequest,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const timeRange = req.query.timeRange as '7d' | '30d' | '90d' || '30d';
     const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90;
     const startDate = new Date(Date.now() - (days * 24 * 60 * 60 * 1000));
@@ -79,7 +79,7 @@ router.get('/trends/:metricType',
     query('segment').optional().isLength({ min: 1, max: 50 })
   ],
   validateRequest,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { metricType } = req.params;
     const timeRange = req.query.timeRange as '7d' | '30d' | '90d' || '30d';
     const segment = req.query.segment as string || 'all';
@@ -110,7 +110,7 @@ router.get('/trends/:metricType',
 // Get cohort analysis
 router.get('/cohorts',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const cohortAnalysis = await growthAnalyticsService.generateCohortAnalysis();
 
     res.json({
@@ -133,7 +133,7 @@ router.post('/track',
     query('referrerUrl').optional().isURL()
   ],
   validateRequest,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const sessionId = req.query.sessionId as string;
     const validEventTypes = ['page_view', 'signup', 'activation', 'conversion'] as const;
     type ValidEventType = typeof validEventTypes[number];

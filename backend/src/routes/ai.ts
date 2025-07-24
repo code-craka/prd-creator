@@ -1,5 +1,5 @@
 import express, { Router } from 'express';
-import { requireAuth, AuthenticatedRequest } from '../middleware/auth';
+import { requireAuth, BackendAuthenticatedRequest } from '../middleware/auth';
 import { aiService } from '../services/aiService';
 import { prdService } from '../services/prdService';
 import { validateBody } from '../middleware/validation';
@@ -12,7 +12,7 @@ const router = Router();
 router.post('/generate-prd',
   requireAuth,
   validateBody(validationSchemas.ai.generatePRD),
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const aiResponse = await aiService.generatePRD(req.body, req.body.provider);
     
     res.json({
@@ -27,7 +27,7 @@ router.post('/generate-prd',
 router.post('/suggestions',
   requireAuth,
   validateBody(validationSchemas.ai.generateSuggestions),
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { prdId, section, content, context } = req.body;
     
     // Verify user has access to the PRD
@@ -47,7 +47,7 @@ router.post('/suggestions',
 router.post('/improve-section',
   requireAuth,
   validateBody(validationSchemas.ai.improveSection),
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { prdId, section, content, feedback } = req.body;
     
     // Verify user has access to the PRD
@@ -67,7 +67,7 @@ router.post('/improve-section',
 router.post('/create-prd',
   requireAuth,
   validateBody(validationSchemas.ai.createFromAI),
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { title, aiResponse, teamId, visibility, templateId } = req.body;
     
     // Create PRD with AI-generated content
@@ -97,7 +97,7 @@ router.post('/create-prd',
 // Validate AI API keys
 router.get('/validate-keys',
   requireAuth,
-  asyncWrapper(async (_req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (_req: BackendAuthenticatedRequest, res: express.Response) => {
     const validation = await aiService.validateAPIKeys();
     
     res.json({
@@ -111,7 +111,7 @@ router.get('/validate-keys',
 // Get AI generation templates and options
 router.get('/templates',
   requireAuth,
-  asyncWrapper(async (_req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (_req: BackendAuthenticatedRequest, res: express.Response) => {
     const templates = {
       prdTypes: [
         {

@@ -6,44 +6,13 @@
 
 import { User } from './index';
 import { UpdateOnboardingProfileRequest } from './onboarding';
+import { UpdateProfileRequest } from './auth';
 
-// ============================================================================
-// AUTHENTICATION TYPES
-// ============================================================================
-
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface RegisterRequest {
-  email: string;
-  name: string;
-  password: string;
-}
-
-export interface AuthResponse {
-  user: User;
-  token: string;
-}
-
-export interface ChangePasswordRequest {
-  currentPassword: string;
-  newPassword: string;
-}
+// Authentication types are now in ./auth.ts to avoid duplication
 
 // ============================================================================
 // PROFILE UPDATE TYPES
 // ============================================================================
-
-/**
- * Basic profile update request for user name and avatar
- * Used for standard profile updates in auth contexts
- */
-export interface UpdateProfileRequest {
-  name?: string;
-  avatar_url?: string;
-}
 
 // UpdateOnboardingProfileRequest is exported from ./onboarding.ts to avoid duplication
 

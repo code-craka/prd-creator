@@ -1,5 +1,5 @@
 import express from 'express';
-import { requireAuth, AuthenticatedRequest } from '../middleware/auth';
+import { requireAuth, BackendAuthenticatedRequest } from '../middleware/auth';
 import { AuthService } from '../services/authService';
 import { validateBody } from '../middleware/validation';
 import { validationSchemas } from '../schemas/validationSchemas';
@@ -42,7 +42,7 @@ router.post('/login',
 // Get current user
 router.get('/me', 
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const user = await AuthService.getCurrentUser(req.user.id);
     
     res.json({
@@ -55,7 +55,7 @@ router.get('/me',
 // Update user profile
 router.put('/profile',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { name, avatar_url } = req.body;
     
     const user = await AuthService.updateProfile(req.user.id, {
@@ -74,7 +74,7 @@ router.put('/profile',
 // Change password
 router.post('/change-password',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { currentPassword, newPassword } = req.body;
     
     await AuthService.changePassword(req.user.id, currentPassword, newPassword);

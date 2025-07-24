@@ -4,7 +4,7 @@ import { requireAuth } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
 import { asyncWrapper } from '../utils/helpers';
 import { publicGalleryService } from '../services/publicGalleryService';
-import { AuthenticatedRequest } from '../middleware/auth';
+import { BackendAuthenticatedRequest } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -48,7 +48,7 @@ router.get('/prds/:slug',
     param('slug').isSlug()
   ],
   validateRequest,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { slug } = req.params;
     const viewerId = req.user?.id;
 
@@ -81,7 +81,7 @@ router.post('/prds/:prdId/publish',
     body('seo_description').optional().isLength({ min: 1, max: 160 })
   ],
   validateRequest,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { prdId } = req.params;
     const userId = req.user!.id;
 
@@ -109,7 +109,7 @@ router.post('/prds/:prdId/like',
     param('prdId').isUUID()
   ],
   validateRequest,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { prdId } = req.params;
     const userId = req.user!.id;
 
@@ -132,7 +132,7 @@ router.post('/prds/:prdId/share',
     body('hashtags').optional().isArray({ max: 5 })
   ],
   validateRequest,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { prdId } = req.params;
     const userId = req.user!.id;
 
@@ -152,7 +152,7 @@ router.post('/prds/:prdId/clone',
     param('prdId').isUUID()
   ],
   validateRequest,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { prdId } = req.params;
     const userId = req.user!.id;
 
@@ -175,7 +175,7 @@ router.post('/prds/:prdId/feature',
     body('featured_until').optional().isISO8601()
   ],
   validateRequest,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { prdId } = req.params;
     const { reason, featured_until } = req.body;
 
@@ -201,7 +201,7 @@ router.post('/prds/:prdId/feature',
 // Update trending PRDs (internal job)
 router.post('/update-trending',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     // TODO: Add admin role check or API key authentication
     await publicGalleryService.updateTrendingPRDs();
 

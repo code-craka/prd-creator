@@ -91,6 +91,9 @@ export interface PaginatedResponse<T = any> {
   };
 }
 
+// Export authentication types
+export * from './auth';
+
 // Export onboarding types
 export * from './onboarding';
 

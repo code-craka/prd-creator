@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { 
-  Users, 
-  UserPlus, 
-  Activity, 
+import {
+  Users,
+  UserPlus,
+  Activity,
   Mail
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
@@ -35,28 +35,28 @@ export default function TeamMembersManager({ className = '' }: TeamMembersManage
 
   const userRole = (currentTeam?.role || 'member') as 'owner' | 'admin' | 'member';
 
-  const { 
-    data: members = [], 
+  const {
+    data: members = [],
     isLoading: membersLoading,
-    error: membersError 
+    error: membersError
   } = useQuery({
     queryKey: ['teamMembers', currentTeam?.id],
     queryFn: () => memberService.getTeamMembersWithActivity(currentTeam!.id),
     enabled: !!currentTeam,
   });
 
-  const { 
-    data: invitations = [], 
-    isLoading: invitationsLoading 
+  const {
+    data: invitations = [],
+    isLoading: invitationsLoading
   } = useQuery({
     queryKey: ['teamInvitations', currentTeam?.id],
     queryFn: () => memberService.getTeamInvitations(currentTeam!.id),
     enabled: !!currentTeam && memberService.canInviteMembers(userRole),
   });
 
-  const { 
-    data: activities = [], 
-    isLoading: activitiesLoading 
+  const {
+    data: activities = [],
+    isLoading: activitiesLoading
   } = useQuery({
     queryKey: ['memberActivity', currentTeam?.id],
     queryFn: () => memberService.getMemberActivity(currentTeam!.id),
@@ -181,20 +181,18 @@ export default function TeamMembersManager({ className = '' }: TeamMembersManage
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors flex-1 ${
-              activeTab === tab.key
-                ? 'bg-purple-600 text-white'
-                : 'text-white/70 hover:text-white hover:bg-white/5'
-            }`}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors flex-1 ${activeTab === tab.key
+              ? 'bg-purple-600 text-white'
+              : 'text-white/70 hover:text-white hover:bg-white/5'
+              }`}
           >
             <tab.icon className="h-4 w-4" />
             <span>{tab.label}</span>
             {tab.count > 0 && (
-              <span className={`px-2 py-1 text-xs rounded-full ${
-                activeTab === tab.key 
-                  ? 'bg-white/20' 
-                  : 'bg-white/10'
-              }`}>
+              <span className={`px-2 py-1 text-xs rounded-full ${activeTab === tab.key
+                ? 'bg-white/20'
+                : 'bg-white/10'
+                }`}>
                 {tab.count}
               </span>
             )}

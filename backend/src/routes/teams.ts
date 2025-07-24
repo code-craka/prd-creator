@@ -1,5 +1,5 @@
 import express from 'express';
-import { requireAuth, AuthenticatedRequest } from '../middleware/auth';
+import { requireAuth, BackendAuthenticatedRequest } from '../middleware/auth';
 import { teamService } from '../services/teamService';
 import { prdService } from '../services/prdService';
 import { memberService } from '../services/memberService';
@@ -13,7 +13,7 @@ const router = express.Router();
 router.post('/', 
   requireAuth,
   validateBody(validationSchemas.team.create),
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { name } = req.body;
     
     const team = await teamService.createTeam(req.user.id, { name });
@@ -29,7 +29,7 @@ router.post('/',
 // Get user's teams
 router.get('/my-teams', 
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const teams = await teamService.getUserTeams(req.user.id);
     
     res.json({
@@ -42,7 +42,7 @@ router.get('/my-teams',
 // Switch current team
 router.post('/switch',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.body;
     
     const team = await teamService.switchTeam(req.user.id, teamId);
@@ -58,7 +58,7 @@ router.post('/switch',
 // Get team details
 router.get('/:teamId',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.params;
     
     const team = await teamService.getTeam(teamId, req.user.id);
@@ -73,7 +73,7 @@ router.get('/:teamId',
 // Update team
 router.put('/:teamId',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.params;
     const { name, description, avatar_url } = req.body;
     
@@ -96,7 +96,7 @@ router.put('/:teamId',
 // Create invitation
 router.post('/:teamId/invitations',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.params;
     const { email, role = 'member', message } = req.body;
     
@@ -119,7 +119,7 @@ router.post('/:teamId/invitations',
 // Get team invitations
 router.get('/:teamId/invitations',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.params;
     
     const invitations = await memberService.getTeamInvitations(teamId, req.user.id);
@@ -134,7 +134,7 @@ router.get('/:teamId/invitations',
 // Resend invitation
 router.post('/:teamId/invitations/:invitationId/resend',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { teamId, invitationId } = req.params;
     
     await memberService.resendInvitation(teamId, req.user.id, invitationId);
@@ -149,7 +149,7 @@ router.post('/:teamId/invitations/:invitationId/resend',
 // Cancel invitation
 router.delete('/:teamId/invitations/:invitationId',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { teamId, invitationId } = req.params;
     
     await memberService.cancelInvitation(teamId, req.user.id, invitationId);
@@ -166,7 +166,7 @@ router.delete('/:teamId/invitations/:invitationId',
 // Get team members with activity data
 router.get('/:teamId/members',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.params;
     
     const members = await memberService.getTeamMembersWithActivity(teamId, req.user.id);
@@ -181,7 +181,7 @@ router.get('/:teamId/members',
 // Update member role
 router.put('/:teamId/members/:memberId/role',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { teamId, memberId } = req.params;
     const { role, reason } = req.body;
     
@@ -197,7 +197,7 @@ router.put('/:teamId/members/:memberId/role',
 // Remove team member
 router.delete('/:teamId/members/:memberId',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { teamId, memberId } = req.params;
     const { reason } = req.body;
     
@@ -215,7 +215,7 @@ router.delete('/:teamId/members/:memberId',
 // Get member activity logs
 router.get('/:teamId/activity',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.params;
     const { limit = 50 } = req.query;
     
@@ -235,7 +235,7 @@ router.get('/:teamId/activity',
 // Get role change history
 router.get('/:teamId/role-history',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.params;
     
     const history = await memberService.getRoleChangeHistory(teamId, req.user.id);
@@ -253,7 +253,7 @@ router.get('/:teamId/role-history',
 router.post('/:teamId/invite',
   requireAuth,
   validateBody(validationSchemas.team.inviteMember),
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.params;
     const { email } = req.body;
     
@@ -270,7 +270,7 @@ router.post('/:teamId/invite',
 router.get('/:teamId/prds',
   requireAuth,
   validateQuery(validationSchemas.prd.filters),
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.params;
     
     const result = await prdService.getTeamPRDs(teamId, req.user.id, req.query as any);
@@ -286,7 +286,7 @@ router.get('/:teamId/prds',
 // Get team settings
 router.get('/:teamId/settings',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.params;
     
     const settings = await teamService.getTeamSettings(teamId, req.user.id);
@@ -301,7 +301,7 @@ router.get('/:teamId/settings',
 // Transfer team ownership
 router.post('/:teamId/transfer-ownership',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.params;
     const { newOwnerId, reason } = req.body;
     
@@ -324,7 +324,7 @@ router.post('/:teamId/transfer-ownership',
 // Delete team
 router.delete('/:teamId',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.params;
     const { reason } = req.body;
     

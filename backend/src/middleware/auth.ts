@@ -3,16 +3,16 @@ import jwt from 'jsonwebtoken';
 import { env } from '../config/env';
 import { db } from '../config/database';
 import { UnauthorizedError } from './errorHandler';
+import { AuthenticatedRequest as SharedAuthRequest, JWTPayload, User } from 'prd-creator-shared';
 
-export interface AuthenticatedRequest extends Request {
-  user: {
-    id: string;
-    email: string;
-    name: string;
-    current_team_id?: string;
-  };
+// Create a backend-specific authenticated request interface
+export interface BackendAuthenticatedRequest extends Request {
+  user: User;
   teamId?: string;
 }
+
+// Re-export the shared interface for backward compatibility
+export type { SharedAuthRequest as AuthenticatedRequest };
 
 export const requireAuth = async (
   req: Request,
@@ -33,7 +33,7 @@ export const requireAuth = async (
     }
 
     // Verify JWT
-    const decoded = jwt.verify(token, env.JWT_SECRET) as any;
+    const decoded = jwt.verify(token, env.JWT_SECRET) as JWTPayload;
     
     if (!decoded.userId) {
       throw new UnauthorizedError('Invalid token format');
@@ -50,12 +50,12 @@ export const requireAuth = async (
     }
 
     // Attach user to request
-    (req as AuthenticatedRequest).user = user;
+    (req as BackendAuthenticatedRequest).user = user;
     
     // Attach team ID from header if provided
     const teamIdHeader = req.headers['x-team-id'] as string;
     if (teamIdHeader) {
-      (req as AuthenticatedRequest).teamId = teamIdHeader;
+      (req as BackendAuthenticatedRequest).teamId = teamIdHeader;
     }
 
     next();
@@ -82,7 +82,7 @@ export const optionalAuth = async (
       const token = authHeader.substring(7);
       
       if (token) {
-        const decoded = jwt.verify(token, env.JWT_SECRET) as any;
+        const decoded = jwt.verify(token, env.JWT_SECRET) as JWTPayload;
         
         if (decoded.userId) {
           const user = await db('users')
@@ -91,7 +91,7 @@ export const optionalAuth = async (
             .first();
 
           if (user) {
-            (req as AuthenticatedRequest).user = user;
+            (req as BackendAuthenticatedRequest).user = user;
           }
         }
       }

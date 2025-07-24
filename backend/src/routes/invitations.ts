@@ -1,5 +1,5 @@
 import express from 'express';
-import { requireAuth, AuthenticatedRequest } from '../middleware/auth';
+import { requireAuth, BackendAuthenticatedRequest } from '../middleware/auth';
 import { memberService } from '../services/memberService';
 import { asyncWrapper } from '../utils/helpers';
 
@@ -8,7 +8,7 @@ const router = express.Router();
 // Accept invitation via token
 router.post('/accept/:token',
   requireAuth,
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { token } = req.params;
     
     const result = await memberService.acceptInvitation(token, req.user.id);

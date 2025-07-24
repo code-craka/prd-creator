@@ -1,5 +1,5 @@
 import express from 'express';
-import { requireAuth, AuthenticatedRequest } from '../middleware/auth';
+import { requireAuth, BackendAuthenticatedRequest } from '../middleware/auth';
 import { analyticsService } from '../services/analyticsService';
 import { validateBody, validateQuery } from '../middleware/validation';
 import { validationSchemas } from '../schemas/validationSchemas';
@@ -11,7 +11,7 @@ const router = express.Router();
 router.post('/events',
   requireAuth,
   validateBody(validationSchemas.analytics.trackEvent),
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { eventType, eventCategory, eventData, prdId, sessionId } = req.body;
     
     await analyticsService.trackEvent({
@@ -37,7 +37,7 @@ router.post('/events',
 router.get('/team-productivity',
   requireAuth,
   validateQuery(validationSchemas.analytics.query),
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { timeRange } = req.query as { timeRange?: string };
     const teamId = req.headers['x-team-id'] as string;
 
@@ -61,7 +61,7 @@ router.get('/team-productivity',
 router.get('/prd-trends',
   requireAuth,
   validateQuery(validationSchemas.analytics.query),
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { timeRange, teamId } = req.query as { timeRange?: string; teamId?: string };
     const currentTeamId = teamId || req.headers['x-team-id'] as string;
 
@@ -78,7 +78,7 @@ router.get('/prd-trends',
 router.get('/template-usage',
   requireAuth,
   validateQuery(validationSchemas.analytics.query),
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.query as { teamId?: string };
     const currentTeamId = teamId || req.headers['x-team-id'] as string;
 
@@ -95,7 +95,7 @@ router.get('/template-usage',
 router.get('/user-engagement',
   requireAuth,
   validateQuery(validationSchemas.analytics.query),
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { teamId } = req.query as { teamId?: string };
     const currentTeamId = teamId || req.headers['x-team-id'] as string;
 
@@ -112,7 +112,7 @@ router.get('/user-engagement',
 router.get('/dashboard',
   requireAuth,
   validateQuery(validationSchemas.analytics.dashboard),
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { timeRange, teamId } = req.query as { timeRange?: string; teamId?: string };
     const currentTeamId = teamId || req.headers['x-team-id'] as string;
 
@@ -146,7 +146,7 @@ router.get('/dashboard',
 router.get('/my-stats',
   requireAuth,
   validateQuery(validationSchemas.analytics.query),
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { timeRange } = req.query as { timeRange?: string };
     
     // This would require a getUserStats method in analyticsService
@@ -166,7 +166,7 @@ router.get('/my-stats',
 router.get('/detailed',
   requireAuth,
   validateQuery(validationSchemas.analytics.query),
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { 
       timeRange, 
       teamId, 
@@ -213,7 +213,7 @@ router.get('/detailed',
 router.post('/export',
   requireAuth,
   validateBody(validationSchemas.analytics.query),
-  asyncWrapper(async (req: AuthenticatedRequest, res: express.Response) => {
+  asyncWrapper(async (req: BackendAuthenticatedRequest, res: express.Response) => {
     const { timeRange, teamId, eventType, eventCategory } = req.body;
     const currentTeamId = teamId || req.headers['x-team-id'] as string;
 
