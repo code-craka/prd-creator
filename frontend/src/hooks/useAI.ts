@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { aiService } from '../services/aiService';
-import { prdService } from '../services/prdService';
 import { toast } from 'react-hot-toast';
 
 export interface AIGenerationRequest {

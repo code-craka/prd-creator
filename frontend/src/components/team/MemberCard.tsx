@@ -16,7 +16,7 @@ import { memberService } from '../../services/memberService';
 
 interface MemberCardProps {
   member: TeamMember;
-  currentUserRole: string;
+  currentUserRole: 'owner' | 'admin' | 'member';
   currentUserId?: string;
   onRoleChange: () => void;
   onRemove: () => void;
@@ -32,8 +32,8 @@ export default function MemberCard({
   const [showMenu, setShowMenu] = useState(false);
 
   const isCurrentUser = member.user_id === currentUserId;
-  const canChangeRole = memberService.canChangeSpecificRole(currentUserRole, member.role) && !isCurrentUser;
-  const canRemove = memberService.canRemoveSpecificMember(currentUserRole, member.role) && !isCurrentUser;
+  const canChangeRole = memberService.canChangeSpecificRole(currentUserRole, member.role as 'owner' | 'admin' | 'member') && !isCurrentUser;
+  const canRemove = memberService.canRemoveSpecificMember(currentUserRole, member.role as 'owner' | 'admin' | 'member') && !isCurrentUser;
 
   const getRoleIcon = (role: string) => {
     switch (role) {
@@ -57,18 +57,19 @@ export default function MemberCard({
     }
   };
 
-  const formatDate = (dateString?: string) => {
+  const formatDate = (dateString?: string | Date) => {
     if (!dateString) return 'Never';
+    const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
     return new Intl.DateTimeFormat('en-US', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
-    }).format(new Date(dateString));
+    }).format(date);
   };
 
-  const formatRelativeTime = (dateString?: string) => {
+  const formatRelativeTime = (dateString?: string | Date) => {
     if (!dateString) return 'Never';
-    const date = new Date(dateString);
+    const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));

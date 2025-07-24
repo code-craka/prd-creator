@@ -47,14 +47,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ className = '' 
     }
   };
 
-  const getTimeRangeLabel = (range: TimeRange): string => {
-    switch (range) {
-      case '7d': return 'Last 7 days';
-      case '30d': return 'Last 30 days';
-      case '90d': return 'Last 90 days';
-      default: return 'Last 30 days';
-    }
-  };
+
 
   if (loading) {
     return (

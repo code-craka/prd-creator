@@ -33,7 +33,7 @@ export default function TeamMembersManager({ className = '' }: TeamMembersManage
   const { currentTeam, user: currentUser } = useAuthStore();
   const queryClient = useQueryClient();
 
-  const userRole = currentTeam?.role || 'member';
+  const userRole = (currentTeam?.role || 'member') as 'owner' | 'admin' | 'member';
 
   const { 
     data: members = [], 

@@ -5,6 +5,7 @@
  */
 
 import { User } from './index';
+import { UpdateOnboardingProfileRequest } from './onboarding';
 
 // ============================================================================
 // AUTHENTICATION TYPES
@@ -44,17 +45,7 @@ export interface UpdateProfileRequest {
   avatar_url?: string;
 }
 
-/**
- * Extended profile update request for onboarding and setup
- * Used during user onboarding and profile configuration
- */
-export interface UpdateOnboardingProfileRequest {
-  companyType?: string;
-  industry?: string;
-  teamSize?: string;
-  experienceLevel?: string;
-  preferences?: Record<string, any>;
-}
+// UpdateOnboardingProfileRequest is exported from ./onboarding.ts to avoid duplication
 
 /**
  * Combined profile update request that includes both basic and onboarding fields

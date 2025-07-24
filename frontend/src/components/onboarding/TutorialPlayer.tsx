@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Play, 
-  Pause, 
   ChevronLeft, 
   ChevronRight, 
   CheckCircle,
@@ -180,7 +178,7 @@ const TutorialPlayer: React.FC<TutorialPlayerProps> = ({
 
         {/* Step Content */}
         <div className="mb-6">
-          {currentStep.content.steps?.map((contentStep, index) => (
+          {currentStep.content.steps?.map((contentStep) => (
             <div key={contentStep.id} className="mb-6 last:mb-0">
               <h4 className="text-lg font-medium text-white mb-3">
                 {contentStep.title}

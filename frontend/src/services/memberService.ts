@@ -12,8 +12,7 @@ import {
   canRemoveMembers,
   canChangeRoles,
   canRemoveSpecificMember,
-  canChangeSpecificRole,
-  TeamRole
+  canChangeSpecificRole
 } from 'prd-creator-shared';
 
 export const memberService = {

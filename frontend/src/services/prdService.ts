@@ -3,9 +3,25 @@ import {
   PRD, 
   CreatePRDRequest, 
   PRDFilters, 
-  PaginatedResponse,
-  buildPRDQueryParams 
+  PaginatedResponse
 } from 'prd-creator-shared';
+
+// Local implementation of buildPRDQueryParams
+function buildPRDQueryParams(filters: PRDFilters): URLSearchParams {
+  const params = new URLSearchParams();
+  
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      if (Array.isArray(value)) {
+        value.forEach(item => params.append(key, String(item)));
+      } else {
+        params.append(key, String(value));
+      }
+    }
+  });
+  
+  return params;
+}
 
 export interface PRDWithAuthor extends PRD {
   author_name: string;

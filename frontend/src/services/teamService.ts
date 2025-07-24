@@ -19,6 +19,23 @@ export interface UpdateTeamRequest {
   avatar_url?: string;
 }
 
+export interface DeleteTeamRequest {
+  confirmName: string;
+  reason?: string;
+}
+
+export interface TransferOwnershipRequest {
+  newOwnerId: string;
+  reason?: string;
+}
+
+export interface TeamSettings {
+  team: Team;
+  memberCount: number;
+  ownerName: string;
+  createdAt: string;
+}
+
 export const teamService = {
   async createTeam(data: CreateTeamRequest): Promise<Team> {
     const response = await apiCall(() => api.post<ApiResponse<{ team: Team }>>('/teams', data));
@@ -64,5 +81,18 @@ export const teamService = {
 
   async removeMember(teamId: string, memberId: string): Promise<void> {
     return apiCall(() => api.delete<ApiResponse>(`/teams/${teamId}/members/${memberId}`));
+  },
+
+  async deleteTeamWithReason(teamId: string, data: DeleteTeamRequest): Promise<void> {
+    return apiCall(() => api.delete<ApiResponse>(`/teams/${teamId}`, { data }));
+  },
+
+  async transferOwnership(teamId: string, data: TransferOwnershipRequest): Promise<void> {
+    return apiCall(() => api.post<ApiResponse>(`/teams/${teamId}/transfer-ownership`, data));
+  },
+
+  async getTeamSettings(teamId: string): Promise<TeamSettings> {
+    const response = await apiCall(() => api.get<ApiResponse<TeamSettings>>(`/teams/${teamId}/settings`));
+    return response;
   },
 };

@@ -4,8 +4,6 @@ import {
   ChevronLeft, 
   X, 
   CheckCircle, 
-  Circle,
-  Clock,
   ArrowRight,
   Sparkles
 } from 'lucide-react';

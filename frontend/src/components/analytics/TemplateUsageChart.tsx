@@ -49,7 +49,7 @@ const TemplateUsageChart: React.FC<TemplateUsageChartProps> = ({ data }) => {
     <div className="space-y-4">
       {/* Chart */}
       <div className="space-y-3">
-        {data.map((template, index) => {
+        {data.map((template) => {
           const percentage = maxUsage > 0 ? (template.usageCount / maxUsage) * 100 : 0;
           
           return (

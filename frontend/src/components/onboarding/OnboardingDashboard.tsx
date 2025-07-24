@@ -8,7 +8,6 @@ import {
   Star,
   Clock,
   TrendingUp,
-  CheckCircle,
   ArrowRight,
   RotateCcw
 } from 'lucide-react';
@@ -24,13 +23,11 @@ const OnboardingDashboard: React.FC = () => {
     error,
     shouldShowOnboarding,
     getCompletionPercentage,
-    getNextStep,
     loadProgress
   } = useOnboarding();
 
   const {
-    recommendations,
-    loading: recommendationsLoading
+    recommendations
   } = useTemplateRecommendations();
 
   const [showWizard, setShowWizard] = useState(false);
@@ -137,7 +134,6 @@ const OnboardingDashboard: React.FC = () => {
   }
 
   const completionPercentage = getCompletionPercentage();
-  const nextStep = getNextStep();
   const quickActions = getQuickActions();
 
   return (

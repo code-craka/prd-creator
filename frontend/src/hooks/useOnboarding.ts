@@ -1,10 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { onboardingService } from '../services/onboardingService';
 import {
-  OnboardingProgress,
   TemplateRecommendation,
-  IndustryClassification,
-  CompanyTypeClassification,
   UpdateOnboardingProfileRequest,
   OnboardingState,
   OnboardingActions,

@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { authSchemas } from 'prd-creator-shared';
+import { authSchemas } from '../../schemas/authSchemas';
 import { useAuthStore } from '../../stores/authStore';
 import { authService, LoginRequest } from '../../services/authService';
 import { Eye, EyeOff, FileText, Loader2 } from 'lucide-react';

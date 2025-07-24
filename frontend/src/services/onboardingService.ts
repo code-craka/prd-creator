@@ -144,7 +144,7 @@ class OnboardingService {
   }
 
   isStepAccessible(stepId: string, progress: OnboardingProgress): boolean {
-    const { onboarding, tutorialSteps } = progress;
+    const { tutorialSteps } = progress;
     const step = tutorialSteps.find(s => s.step_id === stepId);
     
     if (!step) return false;
